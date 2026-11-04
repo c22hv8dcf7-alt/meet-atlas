@@ -368,3 +368,33 @@ footer.site .fineprint{margin-top:28px;border-top:1px solid #22304a;padding-top:
   table.cmp th,table.cmp td{padding:10px}
   table.cmp thead th{top:56px}
 }
+
+/* nav CTA */
+.btn.navcta{padding:8px 16px;font-size:.9rem;margin-left:14px}
+/* refusals (pitfalls) */
+.refusals{list-style:none;margin:30px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.refusals li{border:1px solid var(--goldline);border-radius:14px;padding:18px 20px;background:rgba(255,255,255,.03)}
+.refusals b{display:block;font-family:var(--serif);font-size:1.08rem;margin-bottom:6px}
+.refusals span{opacity:.88;font-size:.96rem}
+.refusals .gold{color:var(--amber);display:inline;font-family:inherit;font-size:inherit;margin:0}
+@media (max-width:760px){.refusals{grid-template-columns:1fr}}
+/* featured download card */
+.plat .p.featured{border:2px solid var(--amber);box-shadow:0 22px 50px rgba(233,168,58,.22)}
+/* Fit Check simulator */
+.fc{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:30px;align-items:start}
+@media (max-width:860px){.fc{grid-template-columns:1fr}}
+.fc-group{margin-bottom:18px}
+.fc-label{display:block;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:.78rem;margin-bottom:8px;opacity:.75}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pills button{border:1px solid var(--goldline);background:#fff;border-radius:999px;padding:8px 14px;font:inherit;font-size:.92rem;cursor:pointer}
+.pills button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.fc-note{font-size:.92rem;opacity:.8;margin-top:4px}
+.fc-verdict{background:linear-gradient(160deg,var(--ink2),var(--ink));color:#e8eef7;border-radius:18px;padding:26px 28px;box-shadow:0 24px 54px rgba(10,17,34,.25)}
+.fc-classlabel{letter-spacing:.16em;text-transform:uppercase;font-size:.75rem;color:var(--amber);font-weight:700}
+.fc-class{font-family:var(--serif);font-size:2.4rem;line-height:1.05;margin:4px 0 14px}
+.fc-rows{margin:0}
+.fc-rows div{display:flex;gap:14px;padding:7px 0;border-top:1px solid rgba(255,255,255,.12)}
+.fc-rows dt{flex:0 0 82px;font-weight:700;opacity:.75;font-size:.88rem;text-transform:uppercase;letter-spacing:.08em;padding-top:2px}
+.fc-rows dd{margin:0}
+.fc-vnote{margin-top:14px;opacity:.9;font-size:.96rem}
+.fc-foot{margin-top:20px;font-size:.94rem;opacity:.85}
