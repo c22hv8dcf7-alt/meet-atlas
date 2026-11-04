@@ -36,15 +36,16 @@
 <section id="waitlist"><div class="wrap">
   <div class="cta-band">
     <h2>Get Atlas — <span class="k">on the way</span></h2>
-    <p>Every edition is a free download, no account needed to use it, ever: <b>Windows</b> (next, on the same core) and <b>Mac</b> (the public edition, in the works). Launches are announced on the Meet Atlas channel the moment an edition is real — pick your platform below.</p>
+    <p>Every edition is a free download, no account needed to use it, ever: <b>Windows</b> (next, on the same core) , <b>Mac</b> (the public edition, in the works) and <b>Linux</b> (in the works). Launches are announced on the Meet Atlas channel the moment an edition is real — pick your platform below.</p>
     <p id="waitlist-chosen" class="waitlist-chosen" hidden></p>
   </div>
   <div class="plat">
     <div class="p" id="waitlist-mac"><div class="scene sm mac" aria-hidden="true"><span class="wm">M</span><img class="logo" src="assets/logos/apple-logo-white.png" alt=""><span class="wl">Waitlist only</span></div><div class="pbody"><div class="big">M</div><h3>Mac waitlist</h3><p>The public edition of the original. Requires Apple Silicon (M1 or later, 8&nbsp;GB RAM minimum) — sized to machines like an 8&nbsp;GB MacBook Air. Launch announced on the channel.</p><a class="btn" href="https://www.youtube.com/@MeetAtlas">Watch for the Mac launch</a></div></div>
     <div class="p" id="waitlist-windows"><div class="scene sm win" aria-hidden="true"><span class="wm">W</span><img class="logo" src="assets/logos/windows-logo.png" alt=""><span class="wl">Waitlist only</span></div><div class="pbody"><div class="big">W</div><h3>Windows waitlist</h3><p>Announced and in the works — same brain, same memory files, same honesty. Launch announced on the channel the moment it is real.</p><a class="btn" href="https://www.youtube.com/@MeetAtlas">Watch for the Windows launch</a></div></div>
+    <div class="p" id="waitlist-linux"><div class="scene sm lin" aria-hidden="true"><span class="wm">L</span><img class="logo" src="assets/logos/tux-logo.png" alt=""><span class="wl">Waitlist only</span></div><div class="pbody"><div class="big">L</div><h3>Linux waitlist</h3><p>In the works — same brain, same memory files, same honesty. Launch announced on the channel the moment it is real.</p><a class="btn" href="https://www.youtube.com/@MeetAtlas">Watch for the Linux launch</a></div></div>
   </div>
 <script>
-(function(){var p=new URLSearchParams(location.search).get('platform')||(location.hash||'').replace('#waitlist-','');if(!p)return;var names={mac:'Mac',windows:'Windows'};if(!names[p])return;var card=document.getElementById('waitlist-'+p);var note=document.getElementById('waitlist-chosen');if(card){card.classList.add('is-chosen')}if(note){note.hidden=false;note.textContent='Your platform — it\u2019s highlighted below.'}})();
+(function(){var p=new URLSearchParams(location.search).get('platform')||(location.hash||'').replace('#waitlist-','');if(!p)return;var names={mac:'Mac',windows:'Windows',linux:'Linux'};if(!names[p])return;var card=document.getElementById('waitlist-'+p);var note=document.getElementById('waitlist-chosen');if(card){card.classList.add('is-chosen')}if(note){note.hidden=false;note.textContent='Your platform — it\u2019s highlighted below.'}})();
 </script>
 </div></section>
 
