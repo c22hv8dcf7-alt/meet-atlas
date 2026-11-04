@@ -1,0 +1,129 @@
+/* ============================================================
+   Meet Atlas — Greeting preview (Atlas approachable pass)
+   Addition-only stylesheet. Loads AFTER styles.css and uses the
+   site's existing tokens (--ink, --teal, --amber, --serif ...).
+   Every class here is prefixed greet- / preview- so the merge
+   cannot collide with the live stylesheet.
+   ============================================================ */
+
+/* The demo's show/hide relies on the hidden attribute, but the site's
+   .btn / grid classes set display and would override it — pin it down. */
+.greet-shell [hidden]{display:none!important}
+
+/* --- Preview badge (claims discipline: visible, repeated) --- */
+.preview-badge{display:inline-flex;align-items:center;gap:8px;font-size:.74rem;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;color:#241703;
+  background:linear-gradient(180deg,#f4bc55,var(--amber) 60%,#df9a26);
+  padding:5px 13px;border-radius:999px;box-shadow:0 6px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.5)}
+.preview-badge::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ink);flex:none}
+.preview-badge.on-light{box-shadow:0 6px 16px rgba(10,17,34,.18),inset 0 1px 0 rgba(255,255,255,.5)}
+.pagehead .preview-badge{position:relative;z-index:1;margin-bottom:18px}
+
+/* --- Honest-preview note band --- */
+.preview-note{max-width:820px;margin:26px auto 0;border:1px dashed rgba(233,168,58,.65);border-radius:14px;
+  padding:16px 20px;color:#ffd98c;background:rgba(233,168,58,.07);font-size:.96rem;text-align:left}
+section .preview-note{color:#7a5410;background:rgba(233,168,58,.12);border-color:rgba(180,120,20,.5);margin-left:0}
+.preview-note b{font-family:var(--serif)}
+
+/* ============================================================
+   THE DEMO — a simulated Atlas stage
+   ============================================================ */
+.greet-shell{max-width:880px;margin:34px auto 0;text-align:left}
+.greet-frame{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+  border:1px solid rgba(233,168,58,.35);border-radius:16px;overflow:hidden;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 20px 44px rgba(0,0,0,.3)}
+.greet-stage{position:relative;padding:28px 30px 30px;min-height:430px;
+  background:
+   radial-gradient(560px 260px at 50% -10%, #1b3260 0%, transparent 62%),
+   radial-gradient(380px 220px at 92% 110%, rgba(30,201,182,.16) 0%, transparent 60%),
+   linear-gradient(165deg,var(--ink2),var(--ink) 78%)}
+.greet-stage::before{content:"";position:absolute;inset:0;opacity:.5;pointer-events:none;
+  background-image:
+   radial-gradient(1.3px 1.3px at 14% 26%, #fff 50%, transparent 51%),
+   radial-gradient(1.1px 1.1px at 78% 18%, #ffe1a3 50%, transparent 51%),
+   radial-gradient(1.2px 1.2px at 88% 64%, #cfe6ff 50%, transparent 51%),
+   radial-gradient(1px 1px at 30% 84%, #9fe8dc 50%, transparent 51%),
+   radial-gradient(1.1px 1.1px at 55% 38%, #fff 50%, transparent 51%)}
+
+/* orb — same construction language as .orbit / .mini-orbit on the live site */
+.greet-orbit{position:relative;width:172px;height:172px;margin:4px auto 10px;opacity:.35;transform:scale(.92);
+  transition:opacity .9s ease,transform .9s ease}
+.greet-orbit::before{content:"";position:absolute;inset:8px;border-radius:50%;
+  background:radial-gradient(circle,rgba(30,201,182,.34) 0%,rgba(30,201,182,.12) 42%,transparent 68%);filter:blur(6px)}
+.greet-orbit::after{content:"";position:absolute;inset:34px;border-radius:50%;
+  background:radial-gradient(circle,rgba(233,168,58,.22) 0%,transparent 65%);filter:blur(8px)}
+.greet-orbit .ring{position:absolute;border:1.6px dotted rgba(233,168,58,.55);border-radius:50%;inset:0}
+.greet-orbit .ring.r2{inset:22px;border-color:rgba(140,180,230,.4)}
+.greet-orbit .ring.r3{inset:46px;border-color:rgba(30,201,182,.45)}
+.greet-orbit .spin{position:absolute;inset:0;animation:spin 70s linear infinite}
+.greet-orbit .spin.s2{animation-duration:110s;animation-direction:reverse}
+.greet-orbit .dot{position:absolute;width:8px;height:8px;border-radius:50%;background:var(--amber);top:50%;left:-4px;box-shadow:0 0 12px var(--amber)}
+.greet-orbit .dot.t{background:var(--teal);box-shadow:0 0 12px var(--teal)}
+.greet-orbit img{position:absolute;left:50%;top:50%;width:74px;height:74px;transform:translate(-50%,-50%);
+  border-radius:19px;box-shadow:0 0 0 7px rgba(30,201,182,.08),0 16px 44px rgba(30,201,182,.45)}
+.greet-frame.is-open .greet-orbit{opacity:1;transform:scale(1)}
+.greet-frame.is-speaking .greet-orbit img{box-shadow:0 0 0 10px rgba(30,201,182,.14),0 16px 54px rgba(30,201,182,.75)}
+
+.greet-state{position:relative;text-align:center;font-size:.72rem;font-weight:700;letter-spacing:.24em;
+  text-transform:uppercase;color:#9fb4d0;margin-bottom:14px}
+.greet-state b{color:var(--teal)}
+
+/* captions — what Atlas "says", typed line by line */
+.greet-captions{position:relative;max-width:640px;margin:0 auto;min-height:118px;text-align:center}
+.greet-line{font-family:var(--serif);font-style:italic;color:#fff;font-size:clamp(1.12rem,2.6vw,1.42rem);
+  line-height:1.45;margin:0 0 10px;min-height:1.45em}
+.greet-line.small{font-size:1.02rem;color:#c6d2e4;font-style:normal;font-family:var(--sans)}
+.greet-caret::after{content:"▍";color:var(--teal);animation:greetblink 1s steps(1) infinite}
+@keyframes greetblink{50%{opacity:0}}
+
+/* option cards */
+.greet-options{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:12px;
+  max-width:680px;margin:18px auto 0}
+.greet-opt{display:block;width:100%;text-align:left;font:inherit;cursor:pointer;color:#eef2f8;
+  background:rgba(255,255,255,.045);border:1px solid rgba(140,180,230,.35);border-radius:13px;
+  padding:15px 17px;transition:transform .16s ease,border-color .16s ease,background .16s ease}
+.greet-opt:hover,.greet-opt:focus-visible{transform:translateY(-2px);border-color:var(--teal);background:rgba(30,201,182,.09);outline:none}
+.greet-opt b{display:block;font-family:var(--serif);font-size:1.06rem;color:#fff;margin-bottom:3px}
+.greet-opt span{font-size:.88rem;color:#a9bcd6;line-height:1.45;display:block}
+.greet-opt[aria-pressed="true"]{border-color:var(--amber);background:rgba(233,168,58,.1)}
+.greet-opt[aria-pressed="true"] b{color:#ffd98c}
+
+/* Atlas response panel */
+.greet-response{position:relative;max-width:680px;margin:18px auto 0;border-top:1px solid rgba(233,168,58,.3);
+  padding-top:18px}
+.greet-response .who{display:block;font-size:.72rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:5px}
+.greet-response .who img{width:16px;height:16px;border-radius:5px;vertical-align:-3px;margin-right:6px}
+.greet-response p{font-family:var(--serif);font-style:italic;color:#fff;font-size:1.08rem;line-height:1.55;margin:0 0 10px}
+.greet-response ul{list-style:none;margin:0 0 6px;padding:0}
+.greet-response li{color:#c6d2e4;font-size:.97rem;padding:5px 0 5px 22px;position:relative}
+.greet-response li::before{content:"—";position:absolute;left:2px;color:var(--teal)}
+.greet-response li b{color:#fff}
+.greet-src{display:inline-block;font-size:.76rem;font-weight:600;letter-spacing:.03em;padding:4px 11px;border-radius:999px;
+  background:rgba(30,201,182,.14);border:1px solid rgba(30,201,182,.4);color:#9fe8dc;margin:2px 6px 2px 0}
+
+/* demo controls */
+.greet-controls{position:relative;display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:22px}
+.greet-voice{display:inline-flex;gap:8px;align-items:center;color:#a9bcd6;font-size:.9rem;cursor:pointer}
+.greet-voice input{accent-color:var(--teal);width:17px;height:17px;cursor:pointer}
+.greet-hint{position:relative;text-align:center;color:#7e90ab;font-size:.84rem;margin-top:12px}
+
+/* marketing: "an opening, minute by minute" list */
+.greet-flow{list-style:none;max-width:760px;margin:28px auto 0;padding:0;text-align:left}
+.greet-flow li{display:flex;gap:18px;padding:16px 0;border-bottom:1px solid var(--line)}
+.greet-flow li:last-child{border-bottom:0}
+.greet-flow .t{flex:0 0 86px;font-weight:700;color:var(--teal-dark);font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;padding-top:4px}
+.greet-flow p{color:var(--muted)}
+.greet-flow p b{color:var(--text);font-family:var(--serif);font-size:1.08rem}
+
+@media (max-width:640px){
+  .greet-options{grid-template-columns:1fr}
+  .greet-stage{padding:22px 18px 24px;min-height:480px}
+  .greet-orbit{width:138px;height:138px}
+  .greet-orbit img{width:60px;height:60px}
+  .greet-flow li{flex-direction:column;gap:4px}
+}
+@media (prefers-reduced-motion:reduce){
+  .greet-orbit .spin{animation:none}
+  .greet-caret::after{animation:none}
+  .greet-orbit,.greet-opt{transition:none}
+}
