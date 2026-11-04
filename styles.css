@@ -329,6 +329,7 @@ footer.site .fineprint{margin-top:28px;border-top:1px solid #22304a;padding-top:
 .req-badge-label{font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--ink);background:linear-gradient(180deg,#f4bc55,var(--amber));padding:3px 9px;border-radius:999px}
 .req-badge-note{color:#9fb4d0;font-weight:400}
 .trust-line{margin-top:12px;font-size:.86rem;letter-spacing:.05em;color:#7fd8cb}
+.status-line{margin-top:10px;font-weight:700;letter-spacing:.06em;color:var(--amber);font-size:.95rem}
 .trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:32px}
 .trust-card{background:linear-gradient(180deg,#fffefb,var(--card) 55%,#faf4e3);border:1px solid var(--line);border-top:4px solid var(--amber);border-radius:14px;padding:22px;box-shadow:0 2px 6px rgba(10,17,34,.05),0 14px 32px rgba(10,17,34,.08)}
 .trust-card b{display:block;font-family:var(--serif);font-size:1.7rem;line-height:1;color:var(--teal-dark);margin-bottom:8px}
