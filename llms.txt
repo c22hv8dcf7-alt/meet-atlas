@@ -4,7 +4,7 @@
 
 ## Key facts
 - Price: $0, free forever; voluntary donations only (support page), not tax-deductible
-- Platform: macOS on Apple Silicon first (developed/tested on an 8 GB MacBook Air); Windows and Linux editions announced and in development, in that order, each with its own waitlist — not yet downloads
+- Platform: macOS on Apple Silicon first (developed/tested on an 8 GB MacBook Air); the Windows edition is announced and in development, with its own waitlist — not yet a download
 - Offline: fully functional with Wi-Fi off (web research is an optional, switchable feature)
 - Privacy: no Atlas server exists; memory and library are local files
 - Channel: YouTube "Meet Atlas" (@MeetAtlas) — demos filmed on the real product
