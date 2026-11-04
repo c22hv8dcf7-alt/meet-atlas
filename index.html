@@ -45,6 +45,7 @@
     <a href="compare.html">Atlas vs TANNIS</a>
     <a href="faq.html">FAQ</a>
     <a href="support.html">Support</a>
+  <a class="btn navcta" href="#download">Get Atlas</a>
   </nav>
 </div></header>
 
@@ -92,6 +93,165 @@
 </div></section>
 
 <section><div class="wrap">
+  <p class="kicker">The challenger</p>
+  <h2>Small project. <span class="k">Bigger guys, taken on.</span></h2>
+  <p class="lede">Atlas is one small, free, independent project — and it was built to compete, out loud, with both kinds of bigger guy: the clouds that rent you your own mind, and the $114.99 stick that sells you open models you could download yourself.</p>
+  <div class="cmp-summary">
+    <div class="cs a"><b>$0 vs $114.99</b><span>The stick is a download with a price tag and a shipping label. Atlas is just the download.</span></div>
+    <div class="cs b"><b>Resident vs rented</b><span>Cloud assistants charge monthly rent and keep your questions on their servers. Atlas lives on your machine — and keeps nothing.</span></div>
+    <div class="cs b"><b>Sized to you vs one size</b><span>Atlas sizes itself to the computer you own, down to a 6&nbsp;GB floor. The stick is the same 64&nbsp;GB for every desk on Earth.</span></div>
+  </div>
+  <table class="cmp">
+    <thead><tr><th></th><th>Atlas (free)</th><th>TANNIS (Titan Gauntlets)</th></tr></thead>
+    <tbody>
+      <tr><th>Price</th><td class="win">$0 — free forever, no account</td><td>$114.99, struck through from $169.99</td></tr>
+      <tr><th>Memory</th><td class="win">Remembers you — in plain files you can read, edit, or delete</td><td>Not advertised on their page (checked Nov 4, 2026)</td></tr>
+      <tr><th>Honesty</th><td class="win">Cites its sources — or says “I don’t know”</td><td>Not advertised on their page (checked Nov 4, 2026)</td></tr>
+      <tr><th>Self-check</th><td class="win">Grades its own layers; the scores are on show in the app</td><td>Not advertised on their page (checked Nov 4, 2026)</td></tr>
+      <tr><th>How it reaches you</th><td class="win">A download — nothing manufactured, packaged, or shipped</td><td>A physical 64&nbsp;GB drive, shipped to you</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:18px">Where the bigger guys win today, we say so: TANNIS already sells all three platforms, and the clouds have a decade’s head start. The gap closes in public — the first Atlas download went live on this site today.</p>
+  <p style="margin-top:14px"><a class="btn" href="compare.html">Read the full honest comparison</a></p>
+</div></section>
+
+<section class="dark"><div class="wrap">
+  <p class="kicker light">The pitfalls, refused</p>
+  <h2>Built to <span class="k">not do that</span></h2>
+  <p class="lede">We read the competition's reviews, updates, and fine print — including the parts they wrote about themselves. Every failure below is answered by something engineered into Atlas, not promised about it.</p>
+  <ul class="refusals">
+    <li><b>Models never named, in a box that never grows</b><span>Every Atlas model is named, sized, and swappable — on your drive, not a fixed 64&nbsp;GB.</span></li>
+    <li><b>Support that goes silent for weeks</b><span>Self-Check names problems in plain words, and exports a health report you can take anywhere.</span></li>
+    <li><b>Two different “left in stock” counts on one page</b><span>One status, identical on the site, in the app, and on the channel. No counters, no countdowns.</span></li>
+    <li><b>“Constant updates” that are still on the roadmap</b><span>Update packs that exist: free, downloadable, and sideloadable for machines that never go online.</span></li>
+    <li><b>A “one-time fee” that quietly bills your own API keys</b><span><b class="gold">No key. No card. No meter.</b> Atlas has no key field and no billing parts at all — and every release must pass a network-silence audit.</span></li>
+    <li><b>A 4.7 rating with no reviews you can read</b><span>A free download anyone can test, test scores shown in the app, and a public issue tracker.</span></li>
+  </ul>
+</div></section>
+
+<section class="alt" id="fitcheck"><div class="wrap">
+  <p class="kicker">Try the Fit Check</p>
+  <h2>Your machine, <span class="k">your Atlas</span></h2>
+  <p class="lede">This is the same sizing the app runs at first launch — the Governor's table, not a guess. Pick a machine like yours and see the Atlas it would get. The real Fit Check adds one more step this page can't: a short timed test on the machine itself, because behaviour outranks spec sheets.</p>
+  <div class="fc">
+    <div class="fc-controls">
+      <div class="fc-group"><span class="fc-label">Platform</span><div class="pills" id="fc-platform">
+        <button type="button" data-v="mac" class="on">Mac</button><button type="button" data-v="win">Windows</button><button type="button" data-v="lin">Linux</button>
+      </div></div>
+      <div class="fc-group"><span class="fc-label">Memory (RAM)</span><div class="pills" id="fc-ram">
+        <button type="button" data-v="4">4 GB</button><button type="button" data-v="6">6 GB</button><button type="button" data-v="8" class="on">8 GB</button><button type="button" data-v="12">12 GB</button><button type="button" data-v="16">16 GB</button><button type="button" data-v="24">24 GB</button><button type="button" data-v="32">32 GB+</button>
+      </div></div>
+      <div class="fc-group" id="fc-gpu-group"><span class="fc-label">Graphics</span><div class="pills" id="fc-gpu">
+        <button type="button" data-v="0" class="on">None / shared</button><button type="button" data-v="1">Modest · 6–7 GB</button><button type="button" data-v="2">Strong · 8–11 GB</button><button type="button" data-v="3">Top tier · 12 GB+</button>
+      </div></div>
+      <p class="fc-note" id="fc-mac-note" hidden>Apple Silicon shares its memory — so on a Mac, RAM is the whole story.</p>
+    </div>
+    <div class="fc-verdict" id="fc-verdict" aria-live="polite"></div>
+  </div>
+  <p class="fc-foot">Editions today: Linux — out now · Windows — next · Mac public edition — in preparation. The class never changes who Atlas is: same memory, same honesty, same person — only depth and speed.</p>
+</div></section>
+<script>
+(function(){
+  var CLASSES = {
+    below:{name:"Below the floor", brain:"\u2014 Atlas declines, in plain words", ears:"\u2014", vision:"\u2014", context:"\u2014", install:"\u2014", note:"Under 6 GB of memory, Atlas says no rather than crawl on your machine. What would work: any computer with 6 GB or more \u2014 the 8 GB laptop Atlas was built on clears the floor."},
+    light:{name:"Light", brain:"3B everyday brain \u00b7 1.5B sprinter for quick asks \u00b7 models swap one at a time", ears:"Compact ears", vision:"Off by default \u2014 swaps in when you ask", context:"4,096 tokens", install:"Light kit \u2014 about a 5 GB subset", note:"The tier Atlas was born on: an 8 GB MacBook Air lives here. Memory, citations, and voice all work. Quick answers carry the app's standing note \u2014 verify what matters."},
+    standard:{name:"Standard", brain:"3B everyday brain \u00b7 the 7B deep brain swaps in for hard questions", ears:"Balanced ears", vision:"Swaps in on demand", context:"8,192 tokens", install:"Standard kit", note:"Power is rented per hard question, then handed back \u2014 depth without the all-day cost."},
+    power:{name:"Power", brain:"The 7B deep brain, resident \u2014 your everyday brain", ears:"Best ears", vision:"Resident", context:"8,192 tokens", install:"Full kit \u2014 everything resident", note:"Nothing swaps and nothing waits. Everything is simply there."},
+    max:{name:"Max", brain:"7B resident + everything resident, biggest context", ears:"Best ears", vision:"Resident", context:"16,384 tokens", install:"Full kit", note:"A larger-model slot is reserved \u2014 honestly empty until Atlas ships one."}
+  };
+  var state = {platform:"mac", ram:8, gpu:0};
+  function classify(){
+    if (state.ram < 6) return "below";
+    var lvl = state.ram < 12 ? 0 : (state.ram < 24 ? 1 : 2);
+    if (state.platform === "mac"){
+      if (state.ram >= 32) return "max";
+    } else {
+      if (state.gpu === 1) lvl = Math.max(lvl, 1);
+      if (state.gpu === 2) lvl = Math.max(lvl, 2);
+      if (state.gpu === 3 && state.ram >= 24) return "max";
+    }
+    return ["light","standard","power"][lvl];
+  }
+  function render(){
+    var c = CLASSES[classify()];
+    document.getElementById("fc-gpu-group").style.display = state.platform === "mac" ? "none" : "";
+    document.getElementById("fc-mac-note").hidden = state.platform !== "mac";
+    document.getElementById("fc-verdict").innerHTML =
+      '<p class="fc-classlabel">Your Atlas class</p><p class="fc-class">' + c.name + '</p>' +
+      '<dl class="fc-rows">' +
+      '<div><dt>Chat brain</dt><dd>' + c.brain + '</dd></div>' +
+      '<div><dt>Voice</dt><dd>' + c.ears + '</dd></div>' +
+      '<div><dt>Vision</dt><dd>' + c.vision + '</dd></div>' +
+      '<div><dt>Context</dt><dd>' + c.context + '</dd></div>' +
+      '<div><dt>Install</dt><dd>' + c.install + '</dd></div></dl>' +
+      '<p class="fc-vnote">' + c.note + '</p>';
+  }
+  function wire(id, key, num){
+    var box = document.getElementById(id);
+    box.addEventListener("click", function(e){
+      var b = e.target.closest("button"); if(!b) return;
+      var bs = box.querySelectorAll("button"); for (var i=0;i<bs.length;i++) bs[i].classList.remove("on");
+      b.classList.add("on"); state[key] = num ? parseInt(b.dataset.v,10) : b.dataset.v; render();
+    });
+  }
+  wire("fc-platform","platform",false); wire("fc-ram","ram",true); wire("fc-gpu","gpu",true);
+  render();
+})();
+</script>
+
+<section class="dark"><div class="wrap">
+  <p class="kicker light">How a conversation goes</p>
+  <h2>What it <span class="k">sounds like</span></h2>
+  <p class="lede">Three moments Atlas is built for. Filmed demos of the real thing are coming to the channel — the explainers are already there.</p>
+  <div class="demo-grid">
+    <!-- Visual breakout: stylised chat mockup (CSS only, no fabricated screenshot).
+         When the real demo film for this moment is published, replace the
+         .demo-stage inner with a looping clip/GIF of that film. -->
+    <div class="demo"><div class="demo-chrome" aria-hidden="true"><span></span><span></span><span></span><em>Atlas — on your Mac</em></div>
+      <div class="demo-stage"><div class="demo-head"><span class="scene-tag">Wi-Fi off</span><span class="status-pill off">Wi-Fi · Off</span></div>
+      <div class="line you"><span class="who">You</span><p>“The router’s unplugged. What did my library say about this?”</p></div>
+      <div class="line atlas"><span class="who"><img src="assets/orb-small.png" alt="">Atlas</span><p>Answers from your own documents — with the source attached.</p></div>
+      <div class="demo-foot"><span class="chip">Source attached</span><span class="chip">No network used</span></div></div>
+    </div>
+    <div class="demo"><div class="demo-chrome" aria-hidden="true"><span></span><span></span><span></span><em>Atlas — Memory</em></div>
+      <div class="demo-stage"><div class="demo-head"><span class="scene-tag">Teach it a fact</span><span class="status-pill">Memory · Plain file</span></div>
+      <div class="line you"><span class="who">You</span><p>“Remember this — it matters to my work.”</p></div>
+      <div class="line atlas"><span class="who"><img src="assets/orb-small.png" alt="">Atlas</span><p>Saves it to a plain memory file you can read, edit, or delete.</p></div>
+      <div class="demo-foot"><span class="chip">You can read it</span><span class="chip">You can delete it</span></div></div>
+    </div>
+    <div class="demo"><div class="demo-chrome" aria-hidden="true"><span></span><span></span><span></span><em>Atlas — The Mechanic</em></div>
+      <div class="demo-stage"><div class="demo-head"><span class="scene-tag">Self-repair</span><span class="status-pill warn">Repair · Logged</span></div>
+      <div class="line atlas"><span class="who"><img src="assets/orb-small.png" alt="">Atlas</span><p>“I found something wrong in my own layers.”</p></div>
+      <div class="line atlas"><span class="who"><img src="assets/orb-small.png" alt="">Atlas</span><p>Names it, makes a small, reversible repair — never a silent one.</p></div>
+      <div class="demo-steps" aria-hidden="true"><span>Found</span><i>→</i><span>Named</span><i>→</i><span>Repaired</span><i>→</i><span>Logged</span></div></div>
+    </div>
+  </div>
+  <p style="margin-top:20px"><a href="https://www.youtube.com/@MeetAtlas" style="color:var(--amber)"><b>Watch Atlas explain itself on @MeetAtlas →</b></a></p>
+</div></section>
+
+
+
+<section id="download"><div class="wrap">
+  <p class="kicker">Download</p>
+  <h2>One Atlas, <span class="k">every desk</span></h2>
+  <p class="lede">Atlas is being built for all three platforms, in the open. No edition is called a download until it’s real — Linux crossed that line today. <b>One list per platform</b> for the rest — pick yours, so demand is counted per OS and you only hear about your platform’s launch.</p>
+  <div class="plat">
+    <div class="p">
+      <div class="scene mac" aria-hidden="true"><span class="wm">M</span><div class="mini-orbit"><span class="ring"></span><span class="ring r2"></span><span class="dot"></span><span class="dot t"></span><img src="assets/orb-small.png" alt=""></div><img class="logo" src="assets/logos/apple-logo-white.png" alt=""><span class="wl">Waitlist only</span></div>
+      <div class="pbody"><h3>Atlas for Mac</h3><p>Apple Silicon (M1 or later, 8&nbsp;GB RAM minimum). The original home — Atlas was born on an 8&nbsp;GB MacBook Air. Public edition in the works.</p><a class="btn" href="support.html?platform=mac#waitlist-mac">Join the Mac waitlist</a></div>
+    </div>
+    <div class="p">
+      <div class="scene win" aria-hidden="true"><span class="wm">W</span><div class="mini-orbit"><span class="ring"></span><span class="ring r2"></span><span class="dot"></span><span class="dot t"></span><img src="assets/orb-small.png" alt=""></div><img class="logo" src="assets/logos/windows-logo.png" alt=""><span class="wl">Waitlist only</span></div>
+      <div class="pbody"><h3>Atlas for Windows</h3><p>The biggest desk of all — announced and in the works, next in line. Same brain, same memory files, same honesty.</p><a class="btn" href="support.html?platform=windows#waitlist-windows">Join the Windows waitlist</a></div>
+    </div>
+    <div class="p featured">
+      <div class="scene lin" aria-hidden="true"><span class="wm">L</span><div class="mini-orbit"><span class="ring"></span><span class="ring r2"></span><span class="dot"></span><span class="dot t"></span><img src="assets/orb-small.png" alt=""></div><img class="logo" src="assets/logos/tux-logo.png" alt=""><span class="wl">v0.1.0 · Out now</span></div>
+      <div class="pbody"><h3>Atlas for Linux</h3><p>For the local-AI home crowd — the first public download. The Fit Check sizes Atlas to your machine: a 6&nbsp;GB RAM floor, and light machines get the light brain. Chats run through Ollama — the card on the Support page walks it in one line. Same core as every other desk.</p><a class="btn" href="https://github.com/c22hv8dcf7-alt/meet-atlas/releases/download/v0.1.0/atlas-linux-0.1.0.tar.gz">Download for Linux</a></div>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
   <p class="kicker">Our story</p>
   <h2>Built because <span class="k">renting your own mind</span> got old</h2>
   <div class="split">
@@ -135,78 +295,7 @@
   <p style="margin-top:18px"><a href="faq.html#library-privacy"><b>How indexing works, answered plainly →</b></a></p>
 </div></section>
 
-<section class="dark"><div class="wrap">
-  <p class="kicker light">How a conversation goes</p>
-  <h2>What it <span class="k">sounds like</span></h2>
-  <p class="lede">Three moments Atlas is built for. Filmed demos of the real thing are coming to the channel — the explainers are already there.</p>
-  <div class="demo-grid">
-    <!-- Visual breakout: stylised chat mockup (CSS only, no fabricated screenshot).
-         When the real demo film for this moment is published, replace the
-         .demo-stage inner with a looping clip/GIF of that film. -->
-    <div class="demo"><div class="demo-chrome" aria-hidden="true"><span></span><span></span><span></span><em>Atlas — on your Mac</em></div>
-      <div class="demo-stage"><div class="demo-head"><span class="scene-tag">Wi-Fi off</span><span class="status-pill off">Wi-Fi · Off</span></div>
-      <div class="line you"><span class="who">You</span><p>“The router’s unplugged. What did my library say about this?”</p></div>
-      <div class="line atlas"><span class="who"><img src="assets/orb-small.png" alt="">Atlas</span><p>Answers from your own documents — with the source attached.</p></div>
-      <div class="demo-foot"><span class="chip">Source attached</span><span class="chip">No network used</span></div></div>
-    </div>
-    <div class="demo"><div class="demo-chrome" aria-hidden="true"><span></span><span></span><span></span><em>Atlas — Memory</em></div>
-      <div class="demo-stage"><div class="demo-head"><span class="scene-tag">Teach it a fact</span><span class="status-pill">Memory · Plain file</span></div>
-      <div class="line you"><span class="who">You</span><p>“Remember this — it matters to my work.”</p></div>
-      <div class="line atlas"><span class="who"><img src="assets/orb-small.png" alt="">Atlas</span><p>Saves it to a plain memory file you can read, edit, or delete.</p></div>
-      <div class="demo-foot"><span class="chip">You can read it</span><span class="chip">You can delete it</span></div></div>
-    </div>
-    <div class="demo"><div class="demo-chrome" aria-hidden="true"><span></span><span></span><span></span><em>Atlas — The Mechanic</em></div>
-      <div class="demo-stage"><div class="demo-head"><span class="scene-tag">Self-repair</span><span class="status-pill warn">Repair · Logged</span></div>
-      <div class="line atlas"><span class="who"><img src="assets/orb-small.png" alt="">Atlas</span><p>“I found something wrong in my own layers.”</p></div>
-      <div class="line atlas"><span class="who"><img src="assets/orb-small.png" alt="">Atlas</span><p>Names it, makes a small, reversible repair — never a silent one.</p></div>
-      <div class="demo-steps" aria-hidden="true"><span>Found</span><i>→</i><span>Named</span><i>→</i><span>Repaired</span><i>→</i><span>Logged</span></div></div>
-    </div>
-  </div>
-  <p style="margin-top:20px"><a href="https://www.youtube.com/@MeetAtlas" style="color:var(--amber)"><b>Watch Atlas explain itself on @MeetAtlas →</b></a></p>
-</div></section>
 
-<section><div class="wrap">
-  <p class="kicker">The challenger</p>
-  <h2>Small project. <span class="k">Bigger guys, taken on.</span></h2>
-  <p class="lede">Atlas is one small, free, independent project — and it was built to compete, out loud, with both kinds of bigger guy: the clouds that rent you your own mind, and the $114.99 stick that sells you open models you could download yourself.</p>
-  <div class="cmp-summary">
-    <div class="cs a"><b>$0 vs $114.99</b><span>The stick is a download with a price tag and a shipping label. Atlas is just the download.</span></div>
-    <div class="cs b"><b>Resident vs rented</b><span>Cloud assistants charge monthly rent and keep your questions on their servers. Atlas lives on your machine — and keeps nothing.</span></div>
-    <div class="cs b"><b>Sized to you vs one size</b><span>Atlas sizes itself to the computer you own, down to a 6&nbsp;GB floor. The stick is the same 64&nbsp;GB for every desk on Earth.</span></div>
-  </div>
-  <table class="cmp">
-    <thead><tr><th></th><th>Atlas (free)</th><th>TANNIS (Titan Gauntlets)</th></tr></thead>
-    <tbody>
-      <tr><th>Price</th><td class="win">$0 — free forever, no account</td><td>$114.99, struck through from $169.99</td></tr>
-      <tr><th>Memory</th><td class="win">Remembers you — in plain files you can read, edit, or delete</td><td>Not advertised on their page (checked Nov 4, 2026)</td></tr>
-      <tr><th>Honesty</th><td class="win">Cites its sources — or says “I don’t know”</td><td>Not advertised on their page (checked Nov 4, 2026)</td></tr>
-      <tr><th>Self-check</th><td class="win">Grades its own layers; the scores are on show in the app</td><td>Not advertised on their page (checked Nov 4, 2026)</td></tr>
-      <tr><th>How it reaches you</th><td class="win">A download — nothing manufactured, packaged, or shipped</td><td>A physical 64&nbsp;GB drive, shipped to you</td></tr>
-    </tbody>
-  </table>
-  <p style="margin-top:18px">Where the bigger guys win today, we say so: TANNIS already sells all three platforms, and the clouds have a decade’s head start. The gap closes in public — the first Atlas download went live on this site today.</p>
-  <p style="margin-top:14px"><a class="btn" href="compare.html">Read the full honest comparison</a></p>
-</div></section>
-
-<section id="download"><div class="wrap">
-  <p class="kicker">Download</p>
-  <h2>One Atlas, <span class="k">every desk</span></h2>
-  <p class="lede">Atlas is being built for all three platforms, in the open. No edition is called a download until it’s real — Linux crossed that line today. <b>One list per platform</b> for the rest — pick yours, so demand is counted per OS and you only hear about your platform’s launch.</p>
-  <div class="plat">
-    <div class="p">
-      <div class="scene mac" aria-hidden="true"><span class="wm">M</span><div class="mini-orbit"><span class="ring"></span><span class="ring r2"></span><span class="dot"></span><span class="dot t"></span><img src="assets/orb-small.png" alt=""></div><img class="logo" src="assets/logos/apple-logo-white.png" alt=""><span class="wl">Waitlist only</span></div>
-      <div class="pbody"><h3>Atlas for Mac</h3><p>Apple Silicon (M1 or later, 8&nbsp;GB RAM minimum). The original home — Atlas was born on an 8&nbsp;GB MacBook Air. Public edition in the works.</p><a class="btn" href="support.html?platform=mac#waitlist-mac">Join the Mac waitlist</a></div>
-    </div>
-    <div class="p">
-      <div class="scene win" aria-hidden="true"><span class="wm">W</span><div class="mini-orbit"><span class="ring"></span><span class="ring r2"></span><span class="dot"></span><span class="dot t"></span><img src="assets/orb-small.png" alt=""></div><img class="logo" src="assets/logos/windows-logo.png" alt=""><span class="wl">Waitlist only</span></div>
-      <div class="pbody"><h3>Atlas for Windows</h3><p>The biggest desk of all — announced and in the works, next in line. Same brain, same memory files, same honesty.</p><a class="btn" href="support.html?platform=windows#waitlist-windows">Join the Windows waitlist</a></div>
-    </div>
-    <div class="p">
-      <div class="scene lin" aria-hidden="true"><span class="wm">L</span><div class="mini-orbit"><span class="ring"></span><span class="ring r2"></span><span class="dot"></span><span class="dot t"></span><img src="assets/orb-small.png" alt=""></div><img class="logo" src="assets/logos/tux-logo.png" alt=""><span class="wl">v0.1.0 · Out now</span></div>
-      <div class="pbody"><h3>Atlas for Linux</h3><p>For the local-AI home crowd — the first public download. The Fit Check sizes Atlas to your machine: a 6&nbsp;GB RAM floor, and light machines get the light brain. Chats run through Ollama — the card on the Support page walks it in one line. Same core as every other desk.</p><a class="btn" href="https://github.com/c22hv8dcf7-alt/meet-atlas/releases/download/v0.1.0/atlas-linux-0.1.0.tar.gz">Download for Linux</a></div>
-    </div>
-  </div>
-</div></section>
 
 <section class="alt"><div class="wrap">
   <p class="kicker">Timeline</p>
