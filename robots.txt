@@ -1,0 +1,35 @@
+# Meet Atlas — everyone welcome, including AI crawlers.
+# We WANT search engines and AI models to read this site and cite it.
+
+User-agent: *
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+# Swap BASE for the live domain at deployment.
+Sitemap: https://c22hv8dcf7-alt.github.io/meet-atlas/sitemap.xml
