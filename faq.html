@@ -27,7 +27,8 @@
   {"@type":"Question","name":"How is Atlas different from a USB AI stick?","acceptedAnswer":{"@type":"Answer","text":"A USB AI stick sells you open models preloaded on a drive. Atlas installs the same class of open models directly on your Mac and adds what a stick doesn't advertise: persistent memory stored in plain files you own, answers cited from your own documents, a published self-evaluation, and safe self-repair — for $0 instead of $114.99."}},
   {"@type":"Question","name":"Is Atlas available for Windows and Linux?","acceptedAnswer":{"@type":"Answer","text":"Windows and Linux editions of Atlas are announced and in development, following the Mac (Apple Silicon) edition, in that order. Each platform has its own waitlist on the Meet Atlas site, and Atlas will not be described as a download for a platform until that edition actually exists."}},
   {"@type":"Question","name":"What does Atlas remember, and can I delete it?","acceptedAnswer":{"@type":"Answer","text":"Facts and preferences you teach it, stored as plain files on your Mac. The 'What Atlas remembers' page inside Atlas lets you view, edit, or delete anything it holds, including everything, in one tap."}},
-  {"@type":"Question","name":"Does Atlas send, post, or buy anything for me?","acceptedAnswer":{"@type":"Answer","text":"No. The public edition never sends messages, posts anything, or spends money. It prepares; you act."}}
+  {"@type":"Question","name":"Does Atlas send, post, or buy anything for me?","acceptedAnswer":{"@type":"Answer","text":"No. The public edition never sends messages, posts anything, or spends money. It prepares; you act."}},
+  {"@type":"Question","name":"How does Atlas index my files? Is any telemetry sent home?","acceptedAnswer":{"@type":"Answer","text":"Atlas indexes only files and folders the user chooses, locally on their own machine. Embeddings are generated locally and the index lives on the user's disk, never uploaded. Atlas ships with 0 telemetry and, with the web door off, makes 0 background network requests."}}
  ]
 }
 </script>
@@ -83,6 +84,9 @@
 
   <details><summary>What does Atlas do with my data?</summary>
   <p>Nothing leaves your Mac. There is no Atlas server, no analytics, no account to hold your data in. Your memory and library are files on your disk; deleting them deletes them.</p></details>
+
+  <details id="library-privacy"><summary>How does Atlas index my files? Is any telemetry sent home?</summary>
+  <p>Locally, and no. Atlas indexes only the files and folders you choose to add — there is no silent whole-disk scan and no background metadata harvesting. Embeddings are generated on your own machine with local models, and the index lives as files on your disk, never uploaded. Atlas ships with <b>0 telemetry</b> and, with the web door off, makes <b>0 background network requests</b> — the check is simple: it works with the Wi-Fi off. Turn web research on and Atlas says plainly when it is using it, and when it has no source.</p></details>
 
   <details><summary>When can I download it?</summary>
   <p>The public edition is in final preparation. Join the waitlist on the <a href="support.html#waitlist">Support page</a> and watch <a href="https://www.youtube.com/@MeetAtlas">Meet Atlas</a> — the Wi-Fi-Off Demo is the first video, filmed on the real thing.</p></details>
