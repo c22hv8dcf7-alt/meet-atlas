@@ -448,3 +448,20 @@ footer.site .fineprint{margin-top:28px;border-top:1px solid #22304a;padding-top:
 .th-open{font-weight:700;font-size:.9rem;text-decoration:none}
 .th-open::after{content:"";position:absolute;inset:0}
 .th-open:hover{text-decoration:underline}
+/* Under-the-hood staging — append to styles.css at deploy.
+   uh- classes only; section reuses .dark/.wrap/.kicker/.lede. */
+
+.uh-badge{display:inline-block;vertical-align:middle;margin-left:8px;padding:3px 12px;border-radius:999px;border:1.5px solid var(--teal);color:#7fd8cb;font-size:.78rem;font-weight:700;letter-spacing:.04em;white-space:nowrap}
+.uh-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:32px}
+.uh-card{background:rgba(246,241,230,.05);border:1px solid rgba(246,241,230,.16);border-radius:14px;padding:22px}
+.uh-card h3{font-family:var(--serif);font-size:1.2rem;color:#fff;margin-bottom:8px}
+.uh-card p{color:#c6d2e4;font-size:.95rem}
+.uh-mock{margin-bottom:16px;min-height:44px;display:flex;align-items:center}
+.uh-shield{display:inline-block;background:rgba(30,201,182,.14);border:1.5px solid var(--teal);color:#a9ecdf;border-radius:999px;padding:7px 14px;font-weight:700;font-size:.85rem}
+.uh-prompt{display:inline-block;background:rgba(246,241,230,.08);border:1px dashed rgba(246,241,230,.4);color:#e7edf6;border-radius:10px;padding:9px 13px;font-size:.85rem;font-style:italic}
+.uh-health{display:inline-flex;align-items:center;gap:10px;color:#e7edf6;font-weight:700;font-size:.85rem}
+.uh-bar{display:inline-block;width:110px;height:9px;border-radius:99px;background:rgba(246,241,230,.18);overflow:hidden;vertical-align:middle}
+.uh-bar i{display:block;height:100%;background:var(--teal);border-radius:99px}
+.uh-note{margin-top:28px;color:#9db0c9;font-size:.95rem;max-width:820px}
+
+@media (max-width:1020px){.uh-grid{grid-template-columns:1fr}}
