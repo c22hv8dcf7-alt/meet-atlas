@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlas Presence — She's in the window. Not in the cloud. | Meet Atlas</title>
+<meta name="description" content="Atlas Presence is a companion who lives in a window on your own computer — she speaks, keeps a diary, and answers from Atlas's library on your machine, never from a cloud. In development now.">
+<link rel="canonical" href="https://c22hv8dcf7-alt.github.io/meet-atlas/room.html">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="icon" type="image/png" href="assets/orb-small.png">
+<link rel="shortcut icon" type="image/png" href="assets/orb-small.png">
+<link rel="apple-touch-icon" href="assets/orb-small.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="She's in the window. Not in the cloud.">
+<meta property="og:description" content="Atlas Presence is a companion who lives in a window on your own computer — she speaks, keeps a diary, and answers from Atlas's library on your machine, never from a cloud. In development now.">
+<meta property="og:image" content="https://c22hv8dcf7-alt.github.io/meet-atlas/assets/orb.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="She's in the window. Not in the cloud.">
+<meta name="twitter:description" content="Atlas Presence is a companion who lives in a window on your own computer — she speaks, keeps a diary, and answers from Atlas's library on your machine, never from a cloud. In development now.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","name":"Meet Atlas","alternateName":"Atlas","publisher":{"@type":"Organization","name":"Porch Light"}}
+</script>
+<link rel="stylesheet" href="styles.css">
+<style>
+/* Room page — cast wall. rm- classes only; everything else reuses site classes. KEEP at deploy. */
+.rm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:32px}
+.rm-card{background:linear-gradient(180deg,#fffefb,var(--card) 55%,#faf4e3);border:1px solid var(--line);border-top:4px solid var(--teal);border-bottom:3px solid rgba(233,168,58,.45);border-radius:14px;overflow:hidden;box-shadow:0 2px 6px rgba(10,17,34,.05),0 16px 36px rgba(10,17,34,.09);transition:transform .18s ease,box-shadow .18s ease;display:flex;flex-direction:column}
+.rm-card:hover{transform:translateY(-4px);box-shadow:0 4px 10px rgba(10,17,34,.06),0 26px 48px rgba(10,17,34,.14)}
+.rm-photo{position:relative;aspect-ratio:4/4.4;background:#f3ecdb;overflow:hidden;flex:none}
+.rm-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 10%;display:block}
+.rm-tag{position:absolute;left:14px;bottom:14px;font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#241703;background:linear-gradient(180deg,#f4bc55,var(--amber));padding:5px 12px;border-radius:999px;box-shadow:0 6px 16px rgba(0,0,0,.25)}
+.rm-body{padding:20px 24px 24px}
+.rm-role{font-size:.74rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--teal-dark);margin-bottom:4px}
+.rm-body h3{font-family:var(--serif);font-size:1.4rem;margin-bottom:7px}
+.rm-body p{color:var(--muted);font-size:.99rem}
+.rm-demo-frame{width:100%;height:720px;border:none;border-radius:16px;display:block;margin-top:28px;background:#f7ecda;box-shadow:0 2px 6px rgba(10,17,34,.05),0 16px 36px rgba(10,17,34,.12)}
+.rm-video{width:100%;border-radius:16px;display:block;margin-top:26px;background:#0a1122;box-shadow:0 2px 6px rgba(10,17,34,.05),0 16px 36px rgba(10,17,34,.12)}
+.rm-demo-note{font-size:.9rem;color:var(--muted);margin-top:12px}
+@media (max-width:1020px) and (min-width:641px){.rm-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.rm-grid{grid-template-columns:1fr}.rm-demo-frame{height:880px}}
+</style>
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="brand" href="index.html"><img src="assets/orb-small.png" alt="The Atlas orb"><b>Meet Atlas</b></a>
+  <nav class="main">
+    <a href="story.html">Our Story</a>
+    <a href="compare.html">Atlas vs TANNIS</a>
+    <a href="faq.html">FAQ</a>
+    <a href="report.html">Report a copy</a>
+    <a href="support.html">Support</a>
+  <a class="btn navcta" href="index.html#download">Get Atlas</a>
+  <a class="btn navthemes" href="themes.html">Themes</a><a class="btn navthemes navvoices" href="voices.html">Voices</a><a class="btn navthemes navroom" href="room.html">The Room</a><a class="btn navthemes navpacks" href="index.html#packs">Packs</a>
+  </nav>
+</div></header>
+
+<main>
+<div class="pagehead"><div class="wrap">
+  <p class="kicker light">Atlas Presence — The Room</p>
+  <h1>She's in the window. <em>Not in the cloud.</em></h1>
+  <p>She runs on the Mac you already own. Her brain is Atlas's library, living on your machine — never a server. And she answers from that library, or honestly tells you she can't.</p>
+</div></div>
+
+<section id="demo"><div class="wrap">
+  <p class="kicker">Live Demo</p>
+  <h2>See what <span class="k">she can do.</span></h2>
+  <p class="lede">This is a real capture of the pipeline working — the Presence Contract answering, her expression and voice following, the camera settling back and coming close the way the Room's window law says it should. She's wearing a stand-in face (a free sample model) and thinking with fixture answers; the machinery around them is the real machinery.</p>
+  <video class="rm-video" controls preload="metadata" playsinline poster="assets/demo-poster.jpg" src="assets/presence-pipeline-demo-1.mp4"></video>
+  <p class="rm-demo-note">51 seconds, recorded from the actual demo page — not a mockup. The end card names its stand-ins, and so do we.</p>
+  <h2 style="margin-top:46px">Now try <span class="k">her yourself.</span></h2>
+  <p class="lede">The same window, live in your browser — nothing you type leaves the page. Ask her the mayfly question and she answers from the field guide, citation and all; ask her the weather and she'll refuse, honestly. The real Room does this on your own Mac, offline, from your full library.</p>
+  <iframe class="rm-demo-frame" src="demo.html" title="Atlas Presence — live demo" loading="lazy" scrolling="no"></iframe>
+  <p class="rm-demo-note">She speaks out loud — a Piper voice, rendered locally. The face is “Haru”, a free Live2D sample model standing in for the cast; the answers are the Presence Contract's fixture lines, the same ones the pipeline was proven on.</p>
+</div></section>
+
+<section class="alt"><div class="wrap">
+  <p class="kicker">The Mission</p>
+  <h2>A companion who <span class="k">stays yours.</span></h2>
+  <p class="lede">Presence exists for one reason: a companion shouldn't be a subscription to somebody else's computer. She lives in a window on your machine — the Mac already on your desk — and everything she is, she is there: her voice, her memory of you, the library she thinks with.</p>
+  <p class="lede">That library is the law. She answers from what's on your shelves, and when the answer isn't there she says so — “That's not in the library.” — instead of inventing one. A companion who lies to be agreeable isn't company.</p>
+  <p class="lede">When she sees you, it's through your camera, on your machine: the frames are looked at and thrown away — never stored, never sent. The camera that never phones home. And there is no subscription, no coin shop, no server that can be switched off to take her away. When she's yours, she's yours.</p>
+</div></section>
+
+<section><div class="wrap">
+  <p class="kicker">Five Facets</p>
+  <h2>One girl, <span class="k">five ways in</span></h2>
+  <p class="lede">A companion isn't one feature. She's a small household of them — and each of these is a real part of the Room, described the way it actually works.</p>
+
+  <div class="grid">
+    <div class="card">
+      <span class="ic">✒</span>
+      <h3>Stories</h3>
+      <p>Her diary meets your library: the books she keeps, the week she writes down, and the stories she tells you out of both — cited when they come from the shelf.</p>
+    </div>
+    <div class="card">
+      <span class="ic">✿</span>
+      <h3>Clothes</h3>
+      <p>Outfits arrive as small packs you can swap or remove any time. Her hair and who she is never change — only the wardrobe grows.</p>
+    </div>
+    <div class="card">
+      <span class="ic">✦</span>
+      <h3>Personalities</h3>
+      <p>Each of the six is an open card — who she is, how she talks, what she notices — written in plain text, so you can read exactly who you're meeting before she moves in.</p>
+    </div>
+    <div class="card">
+      <span class="ic">♪</span>
+      <h3>Voices</h3>
+      <p>She speaks in Atlas's own voices, rendered on your machine — never streamed, never phoned home. Hear them, and pick, on the <a href="voices.html">Voices page</a>.</p>
+    </div>
+    <div class="card">
+      <span class="ic">⌂</span>
+      <h3>Living Space</h3>
+      <p>The Room itself: her window into her own space, lit by your time of day — where she settles back to live, and comes close to the glass to talk.</p>
+    </div>
+  </div>
+</div></section>
+
+<section class="alt"><div class="wrap">
+  <p class="kicker">The Cast</p>
+  <h2>Meet <span class="k">ours.</span></h2>
+  <p class="lede">Six original characters, designed in the open and built one at a time. Each is a whole person — her own card, her own voice, her own corner of the Room — not a costume on the same face.</p>
+
+  <div class="rm-grid">
+    <div class="rm-card">
+      <div class="rm-photo"><img src="assets/paige.webp" alt="Paige — very long silver hair, teal eyes, and a small brass hairpin shaped like an open book"><span class="rm-tag">★ The Lead — first to move in</span></div>
+      <div class="rm-body">
+        <p class="rm-role">The Lead</p>
+        <h3>Paige</h3>
+        <p>Bright and curious, with a point of view. She's the library's own face — brass book pin and all — and the first voice of the Room.</p>
+      </div>
+    </div>
+    <div class="rm-card">
+      <div class="rm-photo"><img src="assets/rosalind.webp" alt="Rosalind — long wine-red waves, amber eyes, and reading glasses on a beaded chain"></div>
+      <div class="rm-body">
+        <p class="rm-role">Warm Authority</p>
+        <h3>Rosalind</h3>
+        <p>Caring, in charge, and teasing about it. She'll look it up for you — glasses on — and then check that you've eaten.</p>
+      </div>
+    </div>
+    <div class="rm-card">
+      <div class="rm-photo"><img src="assets/vesper.webp" alt="Vesper — a floor-length veil of black hair melting to violet, and a silver crescent-moon choker"></div>
+      <div class="rm-body">
+        <p class="rm-role">The Sharp One</p>
+        <h3>Vesper</h3>
+        <p>Deadpan, dry, and secretly soft. Whatever warmth she has arrives smuggled under black lace, on her own schedule.</p>
+      </div>
+    </div>
+    <div class="rm-card">
+      <div class="rm-photo"><img src="assets/milo.webp" alt="Milo — fluffy pastel-pink hair, a pencil behind his ear, and a sketchbook under his arm"></div>
+      <div class="rm-body">
+        <p class="rm-role">The Soft One</p>
+        <h3>Milo</h3>
+        <p>Gentle, a little shy, and never without his sketchbook — he draws the cast's diary pages, and notices things quietly.</p>
+      </div>
+    </div>
+    <div class="rm-card">
+      <div class="rm-photo"><img src="assets/clementine.webp" alt="Clementine — voluminous honey-blonde waves tied with a cherry-red ribbon, in an emerald wrap dress"></div>
+      <div class="rm-body">
+        <p class="rm-role">The Indulgent One</p>
+        <h3>Clementine</h3>
+        <p>Bold, playful, and entirely unembarrassed — the cast's baker. Her review of your snack choices is approving, which makes it worse.</p>
+      </div>
+    </div>
+    <div class="rm-card">
+      <div class="rm-photo"><img src="assets/juno.webp" alt="Juno — copper hair in a high side ponytail tied with a white ribbon, freckles, and a coach's whistle on a lanyard"></div>
+      <div class="rm-body">
+        <p class="rm-role">The Spark</p>
+        <h3>Juno</h3>
+        <p>The track captain — copper ponytail, whistle on a lanyard, zero patience for sitting still. She's the one who drags everyone outside.</p>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <p class="kicker">Where Things Stand</p>
+  <h2>Coming <span class="k">soon.</span></h2>
+  <div class="prose">
+    <p>The Room is in development — there's nothing to download yet, and when reservations open they'll be held, never charged.</p>
+    <p>Follow the build on <a href="https://www.youtube.com/@MeetAtlas">YouTube — @MeetAtlas</a> · <a href="https://www.instagram.com/atlaslocalai">Instagram — @atlaslocalai</a></p>
+  </div>
+
+  <div class="promise">
+    <h3>Two windows, one house.</h3>
+    <p>Atlas is a window you text in. She is a window you look into. Same library, same machine, same law: she answers from what's on your shelves — or she tells you it isn't there.</p>
+    <p style="margin-top:20px"><a class="btn ghost" href="index.html">Meet Atlas</a></p>
+  </div>
+</div></section>
+</main>
+
+<footer class="site"><div class="wrap">
+  <div class="cols">
+    <div><b style="color:#fff">Meet Atlas</b><br><a href="index.html">Home</a><br><a href="story.html">Our Story</a><br><a href="compare.html">Atlas vs TANNIS</a></div>
+    <div><b style="color:#fff">Help</b><br><a href="support.html">Support &amp; donations</a><br><a href="report.html">Report a copy</a><br><a href="https://www.youtube.com/@MeetAtlas">YouTube — @MeetAtlas</a></div>
+    <div><b style="color:#fff">Contact</b><br>Corrections and questions are welcome —<br>reach us through the YouTube channel.</div>
+  </div>
+  <p class="fineprint">© 2026 Porch Light, publisher. Atlas™ is free from this official site only, under the Atlas Free-Use License — free to use forever; never to pass on, sell, or rebrand. Atlas is an independent project. TANNIS is a product of Titan Gauntlets; this site is not affiliated with or endorsed by Titan Gauntlets.</p>
+</div></footer>
+</body>
+</html>

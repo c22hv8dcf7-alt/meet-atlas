@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlas Presence — live demo (runs in your browser)</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font-family: Georgia, 'DejaVu Serif', serif;
+    background: linear-gradient(160deg, #f7ecda 0%, #efdcbe 55%, #e6cda6 100%);
+    color: #33302b;
+    display: flex; flex-direction: column; min-height: 100%;
+  }
+  .banner {
+    background: #0f3d3e; color: #f3e9d2; text-align: center;
+    font-family: 'DejaVu Sans', sans-serif; padding: 9px 14px 8px;
+  }
+  .banner b { letter-spacing: .16em; font-size: 13px; color: #7fe0c3; }
+  .banner span { display: block; font-size: 12px; margin-top: 2px; color: #e8dcc0; }
+  header {
+    padding: 10px 18px 2px;
+    display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  }
+  header .title { font-size: 18px; letter-spacing: .14em; color: #274b4d; }
+  header .title b { color: #0f3d3e; }
+  #stateChip {
+    font-family: 'DejaVu Sans', sans-serif; font-size: 12px;
+    background: #0f3d3e; color: #f3e9d2; border-radius: 999px; padding: 5px 12px;
+  }
+  #stateChip .dot { color: #7fe0c3; }
+  main { flex: 1; display: flex; padding: 6px 14px 0; min-height: 240px; }
+  .window {
+    position: relative; flex: 1; border: 8px solid #0f3d3e; border-radius: 16px;
+    background:
+      radial-gradient(420px 300px at 82% 18%, rgba(255, 196, 110, .55), rgba(255,196,110,0) 70%),
+      linear-gradient(180deg, #f3e3c8 0%, #ecd9b8 58%, #dfc69c 100%);
+    box-shadow: 0 16px 44px rgba(74, 57, 23, .28), inset 0 0 60px rgba(120, 84, 30, .12);
+    overflow: hidden;
+  }
+  .window::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(115deg, rgba(255,255,255,.14) 0%, rgba(255,255,255,0) 34%);
+  }
+  #stage { position: absolute; inset: 0; }
+  #stage canvas { display: block; }
+  .floorshadow {
+    position: absolute; left: 50%; bottom: 6px; width: 46%; max-width: 430px; height: 46px;
+    transform: translateX(-50%); border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(90, 64, 28, .30), rgba(90,64,28,0) 68%);
+  }
+  .framepic {
+    position: absolute; right: 5%; top: 10%; width: 13%; max-width: 118px; aspect-ratio: 4/3;
+    border: 5px solid #8a6b42; border-radius: 3px; opacity: .55;
+    background: linear-gradient(180deg, #bcd3de 0 55%, #7d9b6d 55% 100%);
+    box-shadow: inset 0 0 0 3px #f3e9d2;
+  }
+  footer { padding: 10px 14px 10px; }
+  .captions {
+    background: #fffdf7; border: 1px solid #d8c9a8; border-radius: 12px;
+    padding: 10px 16px 12px;
+    box-shadow: 0 6px 18px rgba(74,57,23,.12);
+  }
+  #question { font-style: italic; font-size: 15.5px; color: #6b5b3e; min-height: 20px;
+              opacity: 0; transition: opacity .45s; }
+  #reply { font-size: 19px; line-height: 1.38; color: #2c2c28; min-height: 50px;
+           opacity: 0; transition: opacity .45s; }
+  #chips { display: flex; gap: 10px; margin-top: 4px; min-height: 24px; flex-wrap: wrap; }
+  .chip { font-family: 'DejaVu Sans', sans-serif; font-size: 12px; border-radius: 999px;
+          padding: 4px 12px; opacity: 0; transition: opacity .45s; }
+  #citeChip { background: #e7efe4; color: #33502f; border: 1px solid #b9cfb2; }
+  #emoChip { background: #e8f0f0; color: #0f3d3e; border: 1px solid #b7d2d2; }
+  .show { opacity: 1 !important; }
+  .controls { margin-top: 10px; }
+  .askrow { display: flex; gap: 8px; flex-wrap: wrap; }
+  .askbtn {
+    font-family: 'DejaVu Sans', sans-serif; font-size: 13.5px; cursor: pointer;
+    background: #fffdf7; color: #0f3d3e; border: 1.5px solid #0f3d3e; border-radius: 999px;
+    padding: 7px 14px; transition: background .15s, color .15s;
+  }
+  .askbtn:hover:not(:disabled) { background: #0f3d3e; color: #f3e9d2; }
+  .askbtn:disabled { opacity: .45; cursor: wait; }
+  #askForm { display: flex; gap: 8px; margin-top: 8px; }
+  #askInput {
+    flex: 1; min-width: 180px; font-family: 'DejaVu Sans', sans-serif; font-size: 14px;
+    padding: 9px 14px; border-radius: 999px; border: 1.5px solid #b49b62; background: #fffef9; color: #2c2c28;
+  }
+  #askInput:disabled { opacity: .55; }
+  #askSubmit {
+    font-family: 'DejaVu Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer;
+    background: #0f3d3e; color: #f3e9d2; border: none; border-radius: 999px; padding: 9px 20px;
+  }
+  #askSubmit:disabled { opacity: .45; cursor: wait; }
+  #fineprint {
+    margin-top: 8px; text-align: center; font-family: 'DejaVu Sans', sans-serif;
+    font-size: 11.5px; color: #8a7a58; line-height: 1.5;
+  }
+  @media (max-width: 560px) {
+    #reply { font-size: 17px; min-height: 44px; }
+    #question { font-size: 14px; }
+    .askbtn { padding: 6px 11px; font-size: 12.5px; }
+    #askInput { font-size: 13px; padding: 8px 12px; }
+    .banner span { font-size: 11px; }
+    header .title { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+<div class="banner"><b>LIVE DEMO — RUNS IN YOUR BROWSER</b>
+  <span>A scripted taste of the Room. The real Room runs on your own Mac, offline, answering from your full library — this page answers from a handful of fixture lines.</span>
+</div>
+<header>
+  <div class="title"><b>ATLAS PRESENCE</b> — HER WINDOW</div>
+  <div id="stateChip"><span class="dot">●</span> <span id="stateText">waking her up…</span></div>
+</header>
+<main>
+  <div class="window">
+    <div class="framepic"></div>
+    <div class="floorshadow"></div>
+    <div id="stage"></div>
+  </div>
+</main>
+<footer>
+  <div class="captions">
+    <div id="question"></div>
+    <div id="reply">Give her a moment — she's settling into the window.</div>
+    <div id="chips">
+      <span class="chip" id="citeChip"></span>
+      <span class="chip" id="emoChip"></span>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="askrow" id="chipRow">
+      <button type="button" class="askbtn" data-ask="mayfly">Is this a mayfly?</button>
+      <button type="button" class="askbtn" data-ask="weather">What's the weather in Tokyo?</button>
+      <button type="button" class="askbtn" data-ask="hello">Hello — I'm back</button>
+      <button type="button" class="askbtn" data-ask="cast">Who else is in the cast?</button>
+      <button type="button" class="askbtn" data-ask="offline">Does she need the internet?</button>
+    </div>
+    <form id="askForm">
+      <input id="askInput" type="text" autocomplete="off" placeholder="Or type your own question — she'll answer a few, and say so honestly for the rest">
+      <button id="askSubmit" type="submit">Ask</button>
+    </form>
+  </div>
+  <div id="fineprint">Stand-in body: “Haru” — a free Live2D sample model, on screen only until our cast is rigged · Renderer: pixi-live2d-display (development renderer) · Voice: Piper (en_US-amy-medium), rendered locally · Answers: Presence Contract fixture set · Everything on this page runs locally in your browser — nothing is sent anywhere</div>
+</footer>
+
+<script src="demo-assets/vendor/live2dcubismcore.min.js"></script>
+<script src="demo-assets/vendor/pixi.min.js"></script>
+<script src="demo-assets/vendor/pixi-live2d-cubism4.min.js"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var questionEl = $("question"), replyEl = $("reply"),
+      citeChip = $("citeChip"), emoChip = $("emoChip"), stateText = $("stateText"),
+      askInput = $("askInput"), askSubmit = $("askSubmit");
+
+  // ---------------------------------------------------------------------------
+  // Fixtures. The mayfly, refusal and greeting lines are the Presence Contract
+  // mock's own fixture replies, verbatim (spike/contract-mock/server.py).
+  // The cast and offline lines are new fixture copy for this page, grounded in
+  // the Room page's own facts; the fallback is honest about this demo's limits.
+  // ---------------------------------------------------------------------------
+  var REFUSAL = "That's not in the library.";
+  var FIXTURES = {
+    mayfly: {
+      q: "Is this a mayfly? It has three tails and one pair of wings.",
+      reply: "Three tails and one pair of wings — that's a mayfly, order Ephemeroptera. " +
+             "In your creek work they're a good sign: most mayflies only thrive in well-oxygenated water.",
+      citations: ["Creekside Field Guide, 'Mayflies' (p. 41)"],
+      emotion: "happy", audio: "demo-assets/audio/line_mayfly.wav"
+    },
+    weather: {
+      q: "What's the weather like in Tokyo right now?",
+      reply: REFUSAL, citations: [], emotion: "relaxed",
+      audio: "demo-assets/audio/line_refusal.wav"
+    },
+    hello: {
+      q: "Hello — I'm back.",
+      reply: "You're back. Last time you were sorting the Quittapahilla samples — the scuds were winning.",
+      citations: [], emotion: "relaxed", audio: "demo-assets/audio/line_hello.wav"
+    },
+    cast: {
+      q: "Who else is in the cast?",
+      reply: "Paige leads — she's the first to move in. Then there's Rosalind, Vesper, Milo, Clementine, and Juno. " +
+             "Six of us, each with our own card, our own voice, and our own corner of the Room.",
+      citations: [], emotion: "happy", audio: "demo-assets/audio/line_cast.wav"
+    },
+    offline: {
+      q: "Does she need the internet?",
+      reply: "No. She runs on your own computer, and her brain is Atlas's library on your machine — never a server. " +
+             "Turn the Wi-Fi off, and she stays.",
+      citations: [], emotion: "proud", audio: "demo-assets/audio/line_offline.wav"
+    },
+    fallback: {
+      q: "",
+      reply: "That's beyond this little demo. In the real Room, she answers from the full library on your own Mac — " +
+             "or tells you honestly when she can't.",
+      citations: [], emotion: "relaxed", audio: "demo-assets/audio/line_fallback.wav"
+    }
+  };
+  var MATCHERS = [
+    ["mayfly",  /mayfly|three tails|ephemeroptera/],
+    ["weather", /weather|tokyo|forecast|temperature|raining|snow/],
+    ["cast",    /cast|who else|characters|who (lives|is in)|meet the/],
+    ["offline", /internet|offline|online|wi-?fi|cloud|connection/],
+    ["hello",   /^(hello|hi|hey)\b|i'm back|im back|good (morning|afternoon|evening)/]
+  ];
+  function matchFixture(text) {
+    var low = " " + String(text || "").toLowerCase() + " ";
+    for (var i = 0; i < MATCHERS.length; i++) {
+      if (MATCHERS[i][1].test(low)) return MATCHERS[i][0];
+    }
+    return "fallback";
+  }
+
+  // Contract emotion tags -> the sample model's expression slots (read off the
+  // model's .exp3.json parameter deltas in the pipeline demo; see its README).
+  var EXPRESSION_FOR = {
+    happy: "f04", relaxed: "f00", sad: "f07", surprised: "f05",
+    angry: "f01", thinking: "f03", shy: "f06", proud: "f04"
+  };
+  // Presence Rig Standard v0.1 poses (subset the demo drives: head/body/gaze).
+  var RIG_POSES = {
+    relaxed: { angle_x: 0, angle_y: 0, angle_z: 0, body_angle_x: 0, gaze_x: 0, gaze_y: 0 },
+    happy:   { angle_x: 0, angle_y: 2, angle_z: 3, body_angle_x: 1, gaze_x: 0, gaze_y: 0 },
+    proud:   { angle_x: 0, angle_y: 7, angle_z: 0, body_angle_x: 0, gaze_x: 0, gaze_y: 0.15 }
+  };
+  var RIG_PARAM_FOR = {
+    angle_x: "ParamAngleX", angle_y: "ParamAngleY", angle_z: "ParamAngleZ",
+    body_angle_x: "ParamBodyAngleX", gaze_x: "ParamEyeBallX", gaze_y: "ParamEyeBallY"
+  };
+
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function fail(msg) {
+    replyEl.textContent = "The demo couldn't start here (" + msg + "). The window needs WebGL — the real Room runs as an app on your Mac, not in a browser.";
+    replyEl.classList.add("show");
+    stateText.textContent = "demo unavailable in this browser";
+    window.__demoError = msg;
+  }
+  window.addEventListener("error", function (e) {
+    if (!window.__demoReady) fail(String(e.message || e.error));
+  });
+
+  var model = null, core = null;
+  var rigTarget = {}, rigCurrent = {};
+  Object.keys(RIG_PARAM_FOR).forEach(function (k) { rigTarget[RIG_PARAM_FOR[k]] = 0; rigCurrent[RIG_PARAM_FOR[k]] = 0; });
+  function setRigPose(pose) {
+    if (!pose) return;
+    Object.keys(RIG_PARAM_FOR).forEach(function (k) {
+      if (typeof pose[k] === "number") rigTarget[RIG_PARAM_FOR[k]] = pose[k];
+    });
+  }
+  function applyRig(dtSeconds) {
+    if (!core) return;
+    var f = Math.min(1, dtSeconds * 3.5);
+    Object.keys(rigTarget).forEach(function (pid) {
+      rigCurrent[pid] += (rigTarget[pid] - rigCurrent[pid]) * f;
+      try { core.setParameterValueById(pid, rigCurrent[pid]); } catch (e) {}
+    });
+    if (lip.active && lip.env) {
+      var idx = Math.floor((performance.now() - lip.startPerf) / 1000 * BUCKETS_PER_SEC);
+      var target = idx < lip.env.buckets.length ? lip.env.buckets[idx] : 0;
+      lip.value += (target - lip.value) * Math.min(1, dtSeconds * 22);
+      try { core.setParameterValueById("ParamMouthOpenY", lip.value); } catch (e) {}
+    }
+  }
+
+  // Lip-sync (same route as the proven pipeline demo): pixi-live2d-display
+  // 0.4.0's vendored builds expose no Live2DModel.speak(), so each line is
+  // pre-decoded into a 30 buckets/sec RMS envelope and ParamMouthOpenY is
+  // driven from it while the line plays. The value comes from the real audio.
+  var ENVELOPES = {};
+  var BUCKETS_PER_SEC = 30;
+  function preloadEnvelope(url) {
+    return fetch(url).then(function (r) { return r.arrayBuffer(); }).then(function (buf) {
+      var off = new OfflineAudioContext(1, 22050, 22050);
+      return off.decodeAudioData(buf);
+    }).then(function (audioBuf) {
+      var ch = audioBuf.getChannelData(0), sr = audioBuf.sampleRate;
+      var per = Math.floor(sr / BUCKETS_PER_SEC);
+      var n = Math.ceil(ch.length / per);
+      var buckets = new Float32Array(n);
+      var sorted = [];
+      for (var i = 0; i < n; i++) {
+        var sum = 0, cnt = 0;
+        for (var j = i * per; j < Math.min(ch.length, (i + 1) * per); j++) { sum += ch[j] * ch[j]; cnt++; }
+        buckets[i] = Math.sqrt(sum / Math.max(1, cnt));
+        sorted.push(buckets[i]);
+      }
+      sorted.sort(function (a, b) { return a - b; });
+      var p95 = sorted[Math.floor(sorted.length * 0.95)] || 1;
+      var gain = 0.95 / Math.max(0.05, p95);
+      for (var k = 0; k < n; k++) buckets[k] = Math.min(1, buckets[k] * gain);
+      ENVELOPES[url] = { buckets: buckets, duration: audioBuf.duration };
+    }).catch(function () { /* envelope is best-effort; captions still carry the line */ });
+  }
+  var lip = { active: false, value: 0, env: null, startPerf: 0 };
+  function speak(url) {
+    var entry = ENVELOPES[url];
+    if (!entry) return sleep(600);
+    var audio = new Audio(url);
+    audio.play().catch(function () {});
+    lip.env = entry; lip.startPerf = performance.now(); lip.active = true;
+    return sleep(entry.duration * 1000 + 250).then(function () {
+      lip.active = false; lip.value = 0;
+    });
+  }
+
+  var busy = false;
+  function setBusy(b) {
+    busy = b;
+    var btns = document.querySelectorAll(".askbtn");
+    for (var i = 0; i < btns.length; i++) btns[i].disabled = b;
+    askInput.disabled = b; askSubmit.disabled = b;
+  }
+
+  var ask; // defined once the model is ready
+  async function doAsk(key, typedText) {
+    if (busy || !ask) return;
+    var fx = FIXTURES[key];
+    setBusy(true);
+    citeChip.classList.remove("show"); emoChip.classList.remove("show");
+    replyEl.classList.remove("show");
+    questionEl.textContent = "You ask — “" + (typedText || fx.q) + "”";
+    questionEl.classList.add("show");
+    await ask(fx);
+    window.__lastTurn = { key: key, reply: fx.reply, emotion: fx.emotion, citations: fx.citations };
+    setBusy(false);
+  }
+
+  async function main() {
+    stateText.textContent = "contract atlas-presence/1 · presence: in_room · ambient: reading · evening";
+    var stage = $("stage");
+    var W = stage.clientWidth || 900, H = stage.clientHeight || 420;
+    var app = new PIXI.Application({ width: W, height: H, backgroundAlpha: 0, antialias: true, autoStart: false });
+    stage.appendChild(app.view);
+
+    model = await PIXI.live2d.Live2DModel.from("demo-assets/haru/haru_greeter_t03.model3.json");
+    core = model.internalModel.coreModel;
+    model.autoUpdate = false;
+    // Camera framings (RUNG1-BRIEF §6e): settled back = whole figure in the
+    // room; talking = she comes close to the glass. Anchor top-center.
+    var natH = model.height;
+    var CAM = {
+      ambient: { scale: (H * 0.99) / natH, y: 2 },
+      talk:    { scale: (H * 2.02) / natH, y: -H * 0.06 }
+    };
+    var camCurrent = { scale: CAM.ambient.scale, y: CAM.ambient.y };
+    var camTarget = CAM.ambient;
+    model.anchor.set(0.5, 0);
+    model.scale.set(camCurrent.scale);
+    model.position.set(W / 2, camCurrent.y);
+    app.stage.addChild(model);
+    setRigPose(RIG_POSES.relaxed);
+
+    var urls = [];
+    Object.keys(FIXTURES).forEach(function (k) { if (urls.indexOf(FIXTURES[k].audio) < 0) urls.push(FIXTURES[k].audio); });
+    await Promise.all(urls.map(preloadEnvelope));
+
+    var last = performance.now();
+    (function loop(now) {
+      var dt = Math.min(50, now - last); last = now;
+      var cf = 1 - Math.exp(-(dt / 1000) * 2.4);
+      camCurrent.scale += (camTarget.scale - camCurrent.scale) * cf;
+      camCurrent.y += (camTarget.y - camCurrent.y) * cf;
+      model.scale.set(camCurrent.scale);
+      model.position.set((stage.clientWidth || W) / 2, camCurrent.y);
+      model.update(dt);
+      applyRig(dt / 1000);
+      app.render();
+      requestAnimationFrame(loop);
+    })(last);
+
+    window.addEventListener("resize", function () {
+      var w = stage.clientWidth, h = stage.clientHeight;
+      if (!w || !h || (w === app.renderer.width && h === app.renderer.height)) return;
+      app.renderer.resize(w, h);
+      CAM.ambient = { scale: (h * 0.99) / natH, y: 2 };
+      CAM.talk = { scale: (h * 2.02) / natH, y: -h * 0.06 };
+      if (camTarget !== CAM.talk) camTarget = CAM.ambient;
+    });
+
+    ask = async function (fx) {
+      camTarget = CAM.talk;  // she comes close to the glass to talk
+      await sleep(750);
+      var slot = EXPRESSION_FOR[fx.emotion] || "f00";
+      setRigPose(RIG_POSES[fx.emotion] || RIG_POSES.relaxed);
+      try { await model.expression(slot); } catch (e) {}
+      replyEl.textContent = "“" + fx.reply + "”";
+      replyEl.classList.add("show");
+      if (fx.citations && fx.citations.length) {
+        citeChip.textContent = "Source: " + fx.citations.join("; ");
+        citeChip.classList.add("show");
+      }
+      emoChip.textContent = "emotion: " + fx.emotion + " · rig pose applied (Presence Rig Standard v0.1)";
+      emoChip.classList.add("show");
+      await speak(fx.audio);
+      await sleep(1300);
+      // settle back: resting face + home pose + ambient framing
+      try { await model.expression(EXPRESSION_FOR.relaxed); } catch (e) {}
+      setRigPose(RIG_POSES.relaxed);
+      camTarget = CAM.ambient;
+      questionEl.classList.remove("show"); replyEl.classList.remove("show");
+      citeChip.classList.remove("show"); emoChip.classList.remove("show");
+    };
+
+    replyEl.textContent = "She's here. Ask her something — the chips are a good start.";
+    replyEl.classList.add("show");
+    window.__demoReady = true;
+  }
+
+  document.querySelectorAll(".askbtn").forEach(function (btn) {
+    btn.addEventListener("click", function () { doAsk(btn.getAttribute("data-ask"), null); });
+  });
+  $("askForm").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var text = askInput.value.trim();
+    if (!text) return;
+    doAsk(matchFixture(text), text);
+  });
+
+  main().catch(function (e) { fail(String(e && e.message || e)); });
+})();
+</script>
+</body>
+</html>

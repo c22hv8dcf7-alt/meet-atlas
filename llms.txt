@@ -25,6 +25,7 @@ TANNIS (T.A.N.N.I.S AI MRK 1, by Titan Gauntlets) is a 64 GB USB drive preloaded
 - FAQ: /faq.html — plain answers, including the free-alternative question
 - Themes: /themes.html — every theme on a full Atlas window; themes are free, always
 - Voices: /voices.html — hear Atlas's six voices (real renders) and pick one
+- The Room (Atlas Presence — coming soon): /room.html — "She's in the window. Not in the cloud." Atlas Presence is a companion who lives in a window on the user's own machine and speaks in Atlas's voices; the page presents the six-character cast, a recorded demo, and a live browser demo. The Room itself is in development: nothing to download yet, and reservations (when they open) are held, never charged.
 - Local AI explained: /offline-ai.html — what local AI is, how an assistant on your own computer works with the Wi-Fi off, what machine it needs, and the honest trade
 - Support: /support.html — platform waitlists and donations
 - Report a copy: /report.html — report Atlas being sold, mirrored, or rebranded elsewhere
