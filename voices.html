@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voices — Meet Atlas</title>
+<meta name="description" content="Hear Atlas's voices — real renders from the engines that run on your own machine. Bella, Heart, Michael, Emma, George, and Ryan, the Atlas News anchor. Press play, and pick the voice you'd like to live with.">
+<link rel="icon" type="image/png" href="assets/orb-small.png">
+<link rel="shortcut icon" type="image/png" href="assets/orb-small.png">
+<link rel="apple-touch-icon" href="assets/orb-small.png">
+<link rel="stylesheet" href="styles.css">
+<style>
+/* Voices page — audition cards. KEEP at deploy. */
+.vc-status{max-width:720px;margin:26px auto 0;font-weight:700;color:var(--teal-dark)}
+.vc-card .vc-engine{font-size:.85rem;color:var(--muted);letter-spacing:.02em;margin-top:-4px}
+.vc-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;align-items:center}
+.vc-play{font:inherit;font-weight:700;font-size:.95rem;padding:12px 22px;border-radius:999px;border:1.5px solid var(--teal-dark);background:transparent;color:var(--teal-dark);cursor:pointer;transition:background .18s ease,color .18s ease}
+.vc-play:hover{background:rgba(30,201,182,.14)}
+.vc-play.vc-playing{background:var(--teal-dark);color:#fff}
+.vc-pick{padding:12px 22px;font-size:.95rem}
+.vc-card{position:relative}
+.vc-card.vc-on{outline:3px solid var(--teal);outline-offset:2px}
+.vc-tag{display:inline-block;margin-top:14px;font-weight:700;font-size:.82rem;color:var(--teal-dark);border:1.5px solid var(--teal);border-radius:999px;padding:3px 12px}
+.vc-tag[hidden]{display:none}
+section.hero-p{padding-bottom:26px}
+</style>
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="brand" href="index.html"><img src="assets/orb-small.png" alt="The Atlas orb"><b>Meet Atlas</b></a>
+  <nav class="main">
+    <a href="story.html">Our Story</a>
+    <a href="compare.html">Atlas vs TANNIS</a>
+    <a href="faq.html">FAQ</a>
+    <a href="report.html">Report a copy</a>
+    <a href="support.html">Support</a>
+  <a class="btn navcta" href="index.html#download">Get Atlas</a>
+  <a class="btn navthemes" href="themes.html">Themes</a><a class="btn navthemes navvoices" href="voices.html">Voices</a><a class="btn navthemes navpacks" href="index.html#packs">Packs</a>
+  </nav>
+</div></header>
+
+<main>
+<section class="hero-p"><div class="wrap" style="text-align:center">
+  <p class="kicker">Atlas Voices</p>
+  <h1>One Atlas. <span style="color:var(--teal-dark)">A voice that's yours.</span></h1>
+  <p class="lede" style="margin:0 auto">These are not actors, and not impressions. Every sample below was spoken by the same voice engines Atlas runs on your own computer — Kokoro and Piper — each saying the same line, so you can compare them fairly. Press play, listen, and pick the one you'd like to live with. When your Atlas wakes up — Chapter Three of <a href="story.html">his story</a> is The Voice — this is the voice he'll greet you in.</p>
+  <p class="vc-status" id="vc-status" aria-live="polite">No voice picked yet. Press play, listen, and pick the one you'd like to live with.</p>
+</div></section>
+
+<section><div class="wrap">
+  <div class="grid">
+    <div class="card vc-card" data-voice="bella" data-src="assets/voices/bella.mp3">
+      <span class="ic">♪</span>
+      <h3>Bella</h3>
+      <p>Warm, close, and unhurried — the voice Atlas greeted his maker in, the night he first spoke out loud.</p>
+      <p class="vc-engine">Kokoro · American · runs on your machine</p>
+      <div class="vc-actions">
+        <button class="vc-play" type="button" data-play aria-label="Play Bella's sample">▶&ensp;Hear her</button>
+        <button class="btn vc-pick" type="button" data-pick>Pick Bella</button>
+      </div>
+      <span class="vc-tag" hidden>★ Your pick</span>
+    </div>
+    <div class="card vc-card" data-voice="heart" data-src="assets/voices/heart.mp3">
+      <span class="ic">♪</span>
+      <h3>Heart</h3>
+      <p>Bright and friendly, first to smile. The morning voice — the one that makes a list of tasks sound like good news.</p>
+      <p class="vc-engine">Kokoro · American · runs on your machine</p>
+      <div class="vc-actions">
+        <button class="vc-play" type="button" data-play aria-label="Play Heart's sample">▶&ensp;Hear her</button>
+        <button class="btn vc-pick" type="button" data-pick>Pick Heart</button>
+      </div>
+      <span class="vc-tag" hidden>★ Your pick</span>
+    </div>
+    <div class="card vc-card" data-voice="michael" data-src="assets/voices/michael.mp3">
+      <span class="ic">♪</span>
+      <h3>Michael</h3>
+      <p>Steady, clear, and even — a calm hand on the tiller. The voice for getting things done without any fuss.</p>
+      <p class="vc-engine">Kokoro · American · runs on your machine</p>
+      <div class="vc-actions">
+        <button class="vc-play" type="button" data-play aria-label="Play Michael's sample">▶&ensp;Hear him</button>
+        <button class="btn vc-pick" type="button" data-pick>Pick Michael</button>
+      </div>
+      <span class="vc-tag" hidden>★ Your pick</span>
+    </div>
+    <div class="card vc-card" data-voice="emma" data-src="assets/voices/emma.mp3">
+      <span class="ic">♪</span>
+      <h3>Emma</h3>
+      <p>Gentle and composed, with soft British edges. The evening voice — unhurried, and easy to listen to for a long while.</p>
+      <p class="vc-engine">Kokoro · British · runs on your machine</p>
+      <div class="vc-actions">
+        <button class="vc-play" type="button" data-play aria-label="Play Emma's sample">▶&ensp;Hear her</button>
+        <button class="btn vc-pick" type="button" data-pick>Pick Emma</button>
+      </div>
+      <span class="vc-tag" hidden>★ Your pick</span>
+    </div>
+    <div class="card vc-card" data-voice="george" data-src="assets/voices/george.mp3">
+      <span class="ic">♪</span>
+      <h3>George</h3>
+      <p>Measured and dry, a quiet authority. Takes its time, and means every word of it.</p>
+      <p class="vc-engine">Kokoro · British · runs on your machine</p>
+      <div class="vc-actions">
+        <button class="vc-play" type="button" data-play aria-label="Play George's sample">▶&ensp;Hear him</button>
+        <button class="btn vc-pick" type="button" data-pick>Pick George</button>
+      </div>
+      <span class="vc-tag" hidden>★ Your pick</span>
+    </div>
+    <div class="card vc-card" data-voice="ryan" data-src="assets/voices/ryan.mp3">
+      <span class="ic">♪</span>
+      <h3>Ryan</h3>
+      <p>Deadpan and precise — the anchor voice of Atlas News, straight off the broadcast. Flat, dry, and quietly funny about it.</p>
+      <p class="vc-engine">Piper · American · the Atlas News voice</p>
+      <div class="vc-actions">
+        <button class="vc-play" type="button" data-play aria-label="Play Ryan's sample">▶&ensp;Hear him</button>
+        <button class="btn vc-pick" type="button" data-pick>Pick Ryan</button>
+      </div>
+      <span class="vc-tag" hidden>★ Your pick</span>
+    </div>
+  </div>
+</div></section>
+
+<section class="alt"><div class="wrap">
+  <p class="kicker">Honest terms</p>
+  <h2>What picking <span class="k">means — today</span></h2>
+  <p class="lede">Picking a voice here is an audition, nothing more and nothing less. Your pick is remembered on this device, in your browser only — no account, no form, and nothing about your choice ever leaves this machine, which is rather the point of Atlas. When your Atlas wakes up with the Voice chapter, this roster is who he can speak as — and the voice you picked here is the one he'll greet you in first.</p>
+  <p class="lede">A voice is data, not code: a small sound file an engine reads aloud with. Swap it or delete it any time, and deleting one just brings the default back. And one law holds in every voice, the way it holds in every theme: the meaning never changes. Warm or deadpan, British or American — Atlas still shows his sources, still says "I don't know" out loud, and still belongs to you.</p>
+  <p style="margin-top:18px"><a class="btn" href="index.html#download">Get Atlas — free</a> <a class="btn dark" href="story.html">Read his story</a></p>
+</div></section>
+</main>
+
+<footer class="site"><div class="wrap">
+  <div class="cols">
+    <div><b style="color:#fff">Meet Atlas</b><br><a href="story.html">Our Story</a><br><a href="compare.html">Atlas vs TANNIS</a></div>
+    <div><b style="color:#fff">Help</b><br><a href="faq.html">FAQ</a><br><a href="support.html">Support &amp; donations</a><br><a href="https://www.youtube.com/@MeetAtlas">YouTube — @MeetAtlas</a></div>
+    <div><b style="color:#fff">Contact</b><br>Corrections and questions are welcome —<br>reach us through the YouTube channel.</div>
+  </div>
+  <p class="fineprint">© 2026 Porch Light, publisher. Atlas™ is free from this official site only, under the Atlas Free-Use License — free to use forever; never to pass on, sell, or rebrand. Atlas is an independent project. TANNIS is a product of Titan Gauntlets; this site is not affiliated with or endorsed by Titan Gauntlets, and comparisons are drawn from their public product page (checked November 4, 2026). Atlas runs on open models (including Qwen, via Ollama) — their licences are listed in the app.</p>
+</div></footer>
+
+<script>
+(function(){
+  var KEY="atlasVoicePick";
+  var names={"bella":"Bella","heart":"Heart","michael":"Michael","emma":"Emma","george":"George","ryan":"Ryan"};
+  var player=new Audio();
+  var currentBtn=null;
+  var status=document.getElementById("vc-status");
+
+  function resetPlayButtons(){
+    document.querySelectorAll("[data-play]").forEach(function(b){
+      b.textContent=b.getAttribute("data-label");
+      b.classList.remove("vc-playing");
+    });
+    currentBtn=null;
+  }
+  function stop(){ player.pause(); try{player.currentTime=0;}catch(e){} resetPlayButtons(); }
+  player.addEventListener("ended", resetPlayButtons);
+
+  document.querySelectorAll("[data-play]").forEach(function(btn){
+    btn.setAttribute("data-label", btn.textContent);
+    btn.addEventListener("click", function(){
+      if(currentBtn===btn){ stop(); return; }
+      var card=btn.closest(".vc-card");
+      stop();
+      player.src=card.getAttribute("data-src");
+      player.play();
+      currentBtn=btn;
+      btn.textContent="❚❚\u2002Playing…";
+      btn.classList.add("vc-playing");
+    });
+  });
+
+  function applyPick(id){
+    document.querySelectorAll(".vc-card").forEach(function(c){
+      var on=c.getAttribute("data-voice")===id;
+      c.classList.toggle("vc-on", on);
+      var tag=c.querySelector(".vc-tag"); if(tag) tag.hidden=!on;
+      var pk=c.querySelector("[data-pick]");
+      if(pk) pk.textContent = on ? "Your pick ✓" : pk.getAttribute("data-picklabel");
+    });
+    if(status){
+      status.textContent = id
+        ? names[id]+" is your pick — remembered on this device. When your Atlas wakes up, that's the voice he'll greet you in."
+        : "No voice picked yet. Press play, listen, and pick the one you'd like to live with.";
+    }
+  }
+
+  document.querySelectorAll("[data-pick]").forEach(function(btn){
+    btn.setAttribute("data-picklabel", btn.textContent);
+    btn.addEventListener("click", function(){
+      var card=btn.closest(".vc-card");
+      var id=card.getAttribute("data-voice");
+      try{ localStorage.setItem(KEY,id); }catch(e){}
+      applyPick(id);
+      var pb=card.querySelector("[data-play]");
+      if(pb && currentBtn!==pb) pb.click();
+    });
+  });
+
+  var saved=null;
+  try{ saved=localStorage.getItem(KEY); }catch(e){}
+  applyPick(saved && names[saved] ? saved : null);
+})();
+</script>
+</body>
+</html>
