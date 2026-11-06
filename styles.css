@@ -548,3 +548,10 @@ nav.main a.btn{text-decoration:none}
 .hs-close p{color:var(--muted);font-size:1.05rem}
 .hs-close .btn{margin-top:20px}
 @media (max-width:720px){.hs-grid{grid-template-columns:1fr}.hs-stay{font-size:1.9rem}}
+
+/* Shelf gallery (themes.html) */
+.shelf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;margin-top:26px}
+.shelf-grid figure{margin:0}
+.shelf-grid img{width:100%;height:auto;display:block;border-radius:12px;border:1px solid rgba(120,120,120,.25)}
+.shelf-grid figcaption{margin-top:8px;font-size:.95rem;opacity:.85}
+.shelf-grid figcaption b{opacity:1}
