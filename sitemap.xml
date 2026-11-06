@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/index.html</loc><lastmod>2026-11-04</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/story.html</loc><lastmod>2026-11-04</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/compare.html</loc><lastmod>2026-11-04</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/faq.html</loc><lastmod>2026-11-04</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/support.html</loc><lastmod>2026-11-04</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/index.html</loc><lastmod>2026-11-05</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/story.html</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/compare.html</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/faq.html</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/support.html</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url>
     <loc>https://c22hv8dcf7-alt.github.io/meet-atlas/report.html</loc>
-    <lastmod>2026-11-04</lastmod>
+    <lastmod>2026-11-05</lastmod>
   </url>
-  <url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/compare-lmstudio.html</loc><lastmod>2026-11-04</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/compare-jan.html</loc><lastmod>2026-11-04</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/greeting.html</loc><lastmod>2026-11-04</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-<url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/themes.html</loc><lastmod>2026-11-04</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/compare-lmstudio.html</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/compare-jan.html</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/greeting.html</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+<url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/themes.html</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/voices.html</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://c22hv8dcf7-alt.github.io/meet-atlas/offline-ai.html</loc><lastmod>2026-11-05</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>
