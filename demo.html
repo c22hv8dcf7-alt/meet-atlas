@@ -108,10 +108,10 @@
 </head>
 <body>
 <div class="banner"><b>LIVE DEMO — RUNS IN YOUR BROWSER</b>
-  <span>A scripted taste of the Room. The real Room runs on your own Mac, offline, answering from your full library — this page answers from a handful of fixture lines.</span>
+  <span>A scripted taste of Presence. The real Presence lives on your own Mac's screen, offline, answering from your full library — this page answers from a handful of fixture lines.</span>
 </div>
 <header>
-  <div class="title"><b>ATLAS PRESENCE</b> — HER WINDOW</div>
+  <div class="title"><b>ATLAS PRESENCE</b> — ON YOUR SCREEN</div>
   <div id="stateChip"><span class="dot">●</span> <span id="stateText">waking her up…</span></div>
 </header>
 <main>
@@ -124,7 +124,7 @@
 <footer>
   <div class="captions">
     <div id="question"></div>
-    <div id="reply">Give her a moment — she's settling into the window.</div>
+    <div id="reply">Give her a moment — she's settling onto your screen.</div>
     <div id="chips">
       <span class="chip" id="citeChip"></span>
       <span class="chip" id="emoChip"></span>
@@ -143,7 +143,7 @@
       <button id="askSubmit" type="submit">Ask</button>
     </form>
   </div>
-  <div id="fineprint">Stand-in body: “Haru” — a free Live2D sample model, on screen only until our cast is rigged · Renderer: pixi-live2d-display (development renderer) · Voice: Piper (en_US-amy-medium), rendered locally · Answers: Presence Contract fixture set · Everything on this page runs locally in your browser — nothing is sent anywhere</div>
+  <div id="fineprint">Stand-in body: “Haru” — a free Live2D sample model, on screen only until our own sprite demo replaces her · Renderer: pixi-live2d-display (development renderer) · Voice: Piper (en_US-amy-medium), rendered locally · Answers: Presence Contract fixture set · Everything on this page runs locally in your browser — nothing is sent anywhere</div>
 </footer>
 
 <script src="demo-assets/vendor/live2dcubismcore.min.js"></script>
@@ -235,7 +235,7 @@
 
   function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   function fail(msg) {
-    replyEl.textContent = "The demo couldn't start here (" + msg + "). The window needs WebGL — the real Room runs as an app on your Mac, not in a browser.";
+    replyEl.textContent = "The demo couldn't start here (" + msg + "). This demo needs WebGL — the real Presence runs as an app on your Mac, not in a browser.";
     replyEl.classList.add("show");
     stateText.textContent = "demo unavailable in this browser";
     window.__demoError = msg;
