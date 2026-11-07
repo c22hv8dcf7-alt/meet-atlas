@@ -570,3 +570,12 @@ nav.main{flex:1 1 auto;min-width:0;flex-wrap:wrap;justify-content:flex-end;row-g
 .shelf-grid img{width:100%;height:auto;display:block;border-radius:12px;border:1px solid rgba(120,120,120,.25)}
 .shelf-grid figcaption{margin-top:8px;font-size:.95rem;opacity:.85}
 .shelf-grid figcaption b{opacity:1}
+
+/* === Shelf row (Levi 2026-11-07): Library hung alone under Packs. The five
+   shelf pills (Themes, Voices, The Room, Packs, Library) now get their own
+   deliberate full-width row under the main nav — one row, right-aligned with
+   the nav above it, Library last in its family instead of orphaned below it.
+   Main row keeps brand + plain links + Get Atlas only, so nothing wraps. */
+nav.shelf{flex:1 1 100%;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end;margin-top:2px}
+nav.shelf .btn.navthemes{margin-left:0}
+@media (max-width:760px){nav.shelf{justify-content:flex-start}}
