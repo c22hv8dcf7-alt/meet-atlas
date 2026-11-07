@@ -549,6 +549,21 @@ nav.main a.btn{text-decoration:none}
 .hs-close .btn{margin-top:20px}
 @media (max-width:720px){.hs-grid{grid-template-columns:1fr}.hs-stay{font-size:1.9rem}}
 
+/* === Header robustness (Levi 2026-11-06): the nav outgrew the bar. Ten items at
+   nowrap widths (~1034px) plus the wordmark can never fit the 1120px wrap, and the
+   old rules squeezed the brand instead — its text overflowed under the first nav
+   link at EVERY width, and below ~1126px viewport the row forced horizontal page
+   scroll (which made the amber strip look cut off). Fix: the logo is untouchable
+   (fixed flex size, wordmark never wraps), the nav may shrink and wrap inside its
+   own space beside the logo, and on small screens it takes a clean full-width row
+   of its own under the logo. Layout only — no copy, no content changes. */
+header.site .wrap{flex-wrap:wrap;row-gap:8px}
+.brand{flex:0 0 auto}
+.brand b{white-space:nowrap}
+nav.main{flex:1 1 auto;min-width:0;flex-wrap:wrap;justify-content:flex-end;row-gap:10px}
+@media (min-width:861px){nav.main{flex-wrap:wrap}}
+@media (max-width:760px){nav.main{flex:1 1 100%;margin-left:0;justify-content:flex-start}}
+
 /* Shelf gallery (themes.html) */
 .shelf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;margin-top:26px}
 .shelf-grid figure{margin:0}
