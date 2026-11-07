@@ -21,6 +21,7 @@ TANNIS (T.A.N.N.I.S AI MRK 1, by Titan Gauntlets) is a 64 GB USB drive preloaded
 - Comparison: /compare.html — Atlas vs TANNIS, sourced rows, facts checked 2026-11-04
 - Atlas vs LM Studio: /compare-lmstudio.html — a respectful comparison (different jobs)
 - Atlas vs Jan: /compare-jan.html — a respectful comparison (different promises)
+- Atlas vs Project NOMAD: /compare-nomad.html — a respectful comparison (a library in a window vs a library on a home server; NOMAD by Crosstalk Solutions is the whole-house offline server — full Wikipedia, maps, courses — and Atlas is the personal, native-Mac on-ramp to the same offline idea)
 - The Greeting (preview): /greeting.html — a labelled simulation of the coming greeting
 - FAQ: /faq.html — plain answers, including the free-alternative question
 - Themes: /themes.html — every theme on a full Atlas window; themes are free, always
