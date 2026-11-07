@@ -174,7 +174,7 @@
       <button id="askSubmit" type="submit">Ask</button>
     </form>
   </div>
-  <div id="fineprint">On screen: Paige — Atlas Presence's own lead, drawn for the cast and performed by our sprite + spring-physics stage (rigid layers, not a mesh rig — her hair rides real springs) · Voice: Piper (en_US-amy-medium), rendered locally · Answers: Presence Contract fixture set · Everything on this page runs locally in your browser — nothing is sent anywhere</div>
+  <div id="fineprint">On screen: Paige — Atlas Presence's own lead, drawn for the cast and performed by our sprite + physics stage — layered plates and bending chains, not a mesh rig: her hair bends on segmented chains; her mouth is a graded two-piece jaw, and she breathes, blinks and glances as she talks · Voice: Piper (en_US-amy-medium), rendered locally · Answers: Presence Contract fixture set · Everything on this page runs locally in your browser — nothing is sent anywhere</div>
 </footer>
 
 <audio id="voice" preload="auto"></audio>
@@ -317,17 +317,17 @@
   // settling-in line, and the fineprint's on-screen sentence.
   var META = {
     paige:  { title: "PAIGE", intro: "She's here. Ask her something — the chips are a good start.",
-              fp: "Paige — Atlas Presence's own lead, drawn for the cast and performed by our sprite + spring-physics stage (rigid layers, not a mesh rig — her hair rides real springs)" },
+              fp: "Paige — Atlas Presence's own lead, drawn for the cast and performed by our sprite + physics stage — layered plates and bending chains, not a mesh rig: her hair bends on segmented chains; her mouth is a graded two-piece jaw, and she breathes, blinks and glances as she talks" },
     clem:   { title: "CLEMENTINE", intro: "She's here. Ask her something — the chips are a good start.",
-              fp: "Clementine — the cast's baker, drawn for the cast and performed by our sprite + spring-physics stage (rigid layers, not a mesh rig — her hair and her ribbon ride real springs)" },
+              fp: "Clementine — the cast's baker, drawn for the cast and performed by our sprite + physics stage — layered plates and bending chains, not a mesh rig: her hair and ribbon stream on segmented chains; her mouth is a graded two-piece jaw, and she breathes, blinks and glances as she talks" },
     milo:   { title: "MILO", intro: "He's here. Ask him something — the chips are a good start.",
-              fp: "Milo — the cast's artist, drawn for the cast and performed by our sprite + spring-physics stage (rigid layers, not a mesh rig — his ears, hair and tail ride real springs, and his tail wags when he's pleased)" },
+              fp: "Milo — the cast's artist, drawn for the cast and performed by our sprite + physics stage — layered plates and bending chains, not a mesh rig: his ears, hair and tail ride chains and springs, his tail wags when he's pleased, and he breathes, blinks and glances as he talks" },
     juno:   { title: "JUNO", intro: "She's here. Ask her something — the chips are a good start.",
-              fp: "Juno — the cast's track captain, drawn for the cast and performed by our sprite + spring-physics stage (rigid layers, not a mesh rig — her ponytail rides a real spring)" },
+              fp: "Juno — the cast's track captain, drawn for the cast and performed by our sprite + physics stage — layered plates and bending chains, not a mesh rig: her ponytail flies on a segmented chain, and she breathes, blinks and glances as she talks" },
     vesper: { title: "VESPER", intro: "She's here. Ask her something — the chips are a good start.",
-              fp: "Vesper — the cast's sharp one, drawn for the cast and performed by our sprite + spring-physics stage (rigid layers, not a mesh rig — her long veil rides real springs)" },
+              fp: "Vesper — the cast's sharp one, drawn for the cast and performed by our sprite + physics stage — layered plates and bending chains, not a mesh rig: her long veil bends on segmented chains, and she breathes, blinks and glances as she talks" },
     mochi:  { title: "MOCHI", intro: "He's here. Ask him something — the chips are a good start.",
-              fp: "Mochi — the cast's good boy, drawn for the cast and performed by our sprite + spring-physics stage (rigid layers, not a mesh rig — his tail wags, lazily, when he approves)" }
+              fp: "Mochi — the cast's good boy, drawn for the cast and performed by our sprite + physics stage — layered plates and bending chains, not a mesh rig: his tail bends on a chain and wags, lazily, when he approves, and he breathes, blinks and glances as he talks" }
   };
   var current = "paige";
   var MATCHERS = [
@@ -363,6 +363,14 @@
   });
   var avatar = new window.PresenceStage.Avatar(charEl, $("voice"), function () {});
   window.__avatar = avatar;
+
+  // Her gaze follows the visitor's cursor over the window (Motion
+  // Pass 2): move the mouse and her eyes find it; take the cursor
+  // away and she settles back to her own drift.
+  if (stageEl) {
+    stageEl.addEventListener("mousemove", function (ev) { avatar.gazeToward(ev.clientX, ev.clientY); });
+    stageEl.addEventListener("mouseleave", function () { avatar.releaseGaze(); });
+  }
 
   function fit() {
     var w = stageEl.clientWidth, h = stageEl.clientHeight;

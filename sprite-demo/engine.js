@@ -35,8 +35,8 @@
 const SPRING_TUNING = {
   body:      { omega: 11.0, zeta: 0.55, gainX: 1.00, gainY: 1.00, rot: 0.00 },
   bust:      { omega:  9.0, zeta: 0.42, gainX: 0.35, gainY: 0.55, rot: 0.00, clamp: 7 },
-  hairBack:  { omega:  9.5, zeta: 0.42, gainX: 1.50, gainY: 1.35, rot: 0.55 },
-  hairFront: { omega: 10.5, zeta: 0.46, gainX: 1.15, gainY: 1.10, rot: 0.30 },
+  hairBack:  { omega:  9.5, zeta: 0.42, gainX: 1.50, gainY: 1.35, rot: 0.55, lift: 0.20 },
+  hairFront: { omega: 10.5, zeta: 0.46, gainX: 1.15, gainY: 1.10, rot: 0.30, lift: 0.35 },
   ribbon:    { omega:  9.5, zeta: 0.40, gainX: 1.90, gainY: 1.60, rot: 1.60 },
   tail:      { omega: 10.0, zeta: 0.45, gainX: 0.90, gainY: 0.80, rot: 0.00 },
 };
@@ -121,6 +121,138 @@ const CHAIN_KICK = { x: 0.0028, y: -0.00184 };
    1/1.75 scale. Droop passes through in degrees (the chain adds its
    per-joint uncurl bias on top). Idle burst windows convert from
    WAG_TUNING's [base, span] ms gates to the chain's {cycle, on}. */
+/* ================================================================
+   MOTION PASS 2 — THE EIGHT STEALS (2026-11-06, Levi: "all eight")
+   Source of record: files/RESEARCH-MOTION-EXAMPLES.md. Every steal
+   is data in the tables below; the Avatar code only reads them.
+   Settle law unchanged: everything returns to rest in <= ~1.6 s.
+   ================================================================ */
+
+// 1. BLINK GRAMMAR (Cubism, research §2.2): close 100 ms, hold
+// 50 ms, open 150 ms; interval randomized around a ~4 s mean;
+// ~1 in 10 blinks is a double; blinks also fire on expression
+// changes and strong leans.
+const BLINK_TUNING = {
+  closeMs: 100, holdMs: 50, openMs: 150,
+  intervalMeanMs: 4000, intervalMinMs: 900,
+  doubleChance: 0.10, doubleGapMs: 300,
+  onExprChance: 0.65, onLeanChance: 0.5, leanMin: 150,
+};
+
+// 2. BREATH STACK (research §2.3): four incommensurate sines
+// (~3.5 / 5.5 / 6.5 / 15.5 s) at display-px amplitudes so tiny the
+// stack never reads as motion — it just kills the perfectly-still
+// tell. amp scales per character (Vesper barely breathes on
+// camera; Juno is an athlete).
+const BREATH_TUNING = {
+  rootY: { period: 3.5, amp: 1.5, phase: 0.0 },
+  faceY: { period: 5.5, amp: 0.8, phase: 2.1 },
+  rootX: { period: 6.5, amp: 1.1, phase: 1.7 },
+  rootR: { period: 15.5, amp: 0.22, phase: 0.6 }, // degrees
+  bustShare: 0.8,   // bust layer samples the rootY breath x this
+  amp: { paige: 1.0, clem: 1.05, milo: 0.9, juno: 1.25, vesper: 0.45, mochi: 0.7 },
+  deepMs: 4000, deepBoost: 1.2, // the scheduler's deep-breath act
+};
+
+// 3. SQUASH & STRETCH (research §2.3/§3.3): volume-conserving
+// (sx = 1/sqrt(sy)) on a spring tuned for the Penner back-ease
+// ~10% overshoot (zeta ~0.59 at the pop spring; the squash spring
+// sits a touch livelier); sy hard-clamped to the field's
+// 1.06-1.10 ceiling. stretchGain is per layer NAME: hair flies,
+// the body barely gives (Plus template ratio ~8:1).
+const SQUASH_TUNING = {
+  omega: 13, zeta: 0.50, min: 0.93, max: 1.10,
+  speechGain: 0.045, hopKick: 2.0, dipKick: -0.55, actKick: 0.8,
+  stretchGain: { hairback: 0.9, hairfront: 0.8, ribbon: 0.7, tail: 0.6, bust: 0.25, body: 0.12 },
+};
+
+// 4. TALK-LIFT + PER-EXPRESSION MOTION ROWS (research §2.6):
+// the head lifts 6-10 px while she speaks and a few elements
+// stir (hair shares the lift through SPRING_TUNING lift shares).
+// gain scales every impulse (springs + chains); fade is the
+// expression crossfade each state asks for (surprise snaps in
+// ~60 ms, shy creeps in ~250 ms). charScale multiplies the row
+// per character: Vesper minimal, Juno maximal — characterization
+// as data.
+const LIFT_TUNING = { px: 8, attackMs: 90, releaseMs: 250 };
+const EXPR_MOTION = {
+  neutral:      { gain: 1.00, fade: 90 },
+  talk:         { gain: 1.00, fade: 45 },
+  talk_half:    { gain: 1.00, fade: 45 },
+  happy:        { gain: 1.08, fade: 90 },
+  closed_happy: { gain: 1.05, fade: 90 },
+  wink:         { gain: 1.00, fade: 80 },
+  sparkle:      { gain: 1.15, fade: 80 },
+  smug:         { gain: 0.90, fade: 120 },
+  sad:          { gain: 0.80, fade: 160 },
+  surprised:    { gain: 1.12, fade: 60 },
+  angry:        { gain: 1.05, fade: 80 },
+  thinking:     { gain: 0.85, fade: 140 },
+  shy:          { gain: 0.90, fade: 250 },
+  proud:        { gain: 1.05, fade: 110 },
+  blink:        { gain: 1.00, fade: 30 },
+};
+const EXPR_CHAR_SCALE = { paige: 1.0, clem: 1.0, milo: 1.0, juno: 1.15, vesper: 0.65, mochi: 1.0 };
+
+// 5. ANTICIPATION (research §2.4): a 60-100 ms counter-dip + a
+// blink land just before hops and laughs; scale pops ride the
+// squash spring's overshoot and a face pop spring with the same
+// Penner flavor (zeta 0.59 ~= s=1.70158's 10%).
+const ANTICIPATION_TUNING = { dipMs: 85, dipVy: 34, facePopOmega: 16, facePopZeta: 0.59, facePopKick: 0.9 };
+
+// 6. GAZE (research §2.5): saccade grammar — holds of 0.3-2 s,
+// ~2-frame jumps (the plate swap IS the jump), the head follows
+// 100-200 ms later at a fraction of the eye travel. Plates are
+// derived from each character's own neutral face (gazeplates.py;
+// audit in work/gaze-audit.json) and show only over the states
+// the plate was visually graded safe on. Travel is clamped to
+// the mapping below — never a yeet.
+const GAZE_TUNING = {
+  holdMinMs: 300, holdMaxMs: 2000,
+  staleMs: 2500,            // external target older than this -> drift
+  driftRadius: 0.45,        // drift saccades stay near center
+  centerDead: 0.28,         // |g| below this reads as center
+  followLagMs: 150,         // head-follow lag (100-200 ms band)
+  followFrac: 0.35,         // head offset = eye travel x this
+  followPx: 5,              // native px of head travel at |g| = 1
+  bigSaccade: 0.9,          // |delta g| past this may draw a blink
+};
+
+// 7. IDLE SCHEDULER (research §2.7, Shimeji grammar): weighted
+// acts with cooldowns and conditions, fired in the gaps of a
+// per-character density range. Acts use only parts we own:
+// sway (the old micro-kick), look (a drift-gaze excursion),
+// hairfix, stretch, breath (a deep one), tailflick (tailed
+// characters, only out of the idle wag class). Nothing fires
+// while she talks or a voice envelope is live; nothing but
+// breath fires while she is sad.
+const IDLE_TUNING = {
+  gapMs: [2600, 5200],
+  acts: {
+    sway:     { w: 5, cdMs: 0 },
+    look:     { w: 3, cdMs: 5000 },
+    hairfix:  { w: 2, cdMs: 9000 },
+    breath:   { w: 2, cdMs: 12000 },
+    stretch:  { w: 1, cdMs: 15000 },
+    tailflick:{ w: 2, cdMs: 8000 },
+  },
+  chars: {
+    vesper: { gapMs: [6000, 11000], acts: { sway: 3, look: 2, hairfix: 1, breath: 2, stretch: 0, tailflick: 0 } },
+    juno:   { gapMs: [2200, 4200],  acts: { sway: 5, look: 4, hairfix: 3, breath: 2, stretch: 2, tailflick: 0 } },
+    mochi:  { gapMs: [5000, 9000],  acts: { sway: 3, look: 3, hairfix: 1, breath: 3, stretch: 1, tailflick: 2 } },
+    milo:   { gapMs: [2400, 4600],  acts: { sway: 5, look: 3, hairfix: 2, breath: 1, stretch: 1, tailflick: 3 } },
+    clem:   { gapMs: [2600, 5000],  acts: { sway: 5, look: 3, hairfix: 3, breath: 2, stretch: 1, tailflick: 0 } },
+  },
+};
+
+// 8. PERFORMANCE DYNAMICS (research §2.1): her own voice
+// envelope, slowed, scales how big she moves inside a line —
+// a whisper sways, a peak bounces. A sustained peak on a happy
+// face may bump the expression one notch (HONK's escalation),
+// once per line; the perform scripts pin flags.escalate=false
+// so the recorded proofs stay exactly as choreographed.
+const DYN_TUNING = { tcMs: 300, base: 0.55, span: 0.75, escHot: 0.92, escHoldMs: 150 };
+
 const CHAIN_WAG_AMP = 1 / 1.75;
 function chainWagClasses(charKey, droopScale) {
   const row = WAG_TUNING[charKey] || WAG_TUNING.default;
@@ -160,6 +292,7 @@ const EXPRESSIONS = ["neutral", "happy", "closed_happy", "wink", "sparkle", "smu
                      "sad", "surprised", "angry", "thinking", "shy", "proud"];
 const CHARACTERS = {
   paige: { label: "Paige", spriteDir: "assets/paige", layerDir: "assets/paige-layers",
+           gaze: { eye: [799, 453], safe: ["neutral","talk","talk_half","happy","sad","surprised","angry","thinking","shy","proud"] },
            layers: ["hairback", "body", "bust", "face", "hairfront"],
            mouth: { 1: "talk_half", 2: "talk" },
            jaw: { pivot: "50.6% 35.5%", maxDeg: 9 },
@@ -173,6 +306,7 @@ const CHARACTERS = {
              hairfront: [
                { tune: "hairFront", strip: [470, 695], anchor: [815, 425], dir: 90, segLen: 131, bandTop: 415, bandBottom: 952, overlap: 30 } ] } },
   clem:  { label: "Clementine", spriteDir: "assets/clem", layerDir: "assets/clem-layers",
+           gaze: { eye: [801, 460], safe: ["neutral","talk","talk_half","happy","sad","surprised","angry","thinking","shy","proud"] },
            layers: ["hairback", "ribbon", "body", "bust", "face", "hairfront"],
            mouth: { 1: "talk_half", 2: "talk" },
            jaw: { pivot: "50.5% 35.6%", maxDeg: 10 },
@@ -202,6 +336,7 @@ const CHARACTERS = {
      tuning record's. Milo + Mochi declare their tail layer, which
      switches the wag driver on with their own WAG_TUNING rows. */
   milo:  { label: "Milo", spriteDir: "assets/milo", layerDir: "assets/milo-layers",
+           gaze: { eye: [749, 370], safe: ["neutral","talk","talk_half","happy","smug","sad","surprised","angry","thinking","shy","proud"] },
            layers: ["hairback", "tail", "body", "face", "hairfront"],
            mouth: { 1: "talk_half", 2: "talk" },
            stateMap: { closed_happy: "closedhappy", talk_half: "talkhalf", smug: "halflid" },
@@ -222,6 +357,7 @@ const CHARACTERS = {
              tail: [
                { tune: "tail", strip: [1180, 340], anchor: [1225, 1475], dir: -64, segLen: 148, restRot: [-67, -68, -100, -131], preRoll: 120, bandTop: 905, bandBottom: 1525, wag: true, droopScale: 0.75 } ] } },
   juno:  { label: "Juno", spriteDir: "assets/juno", layerDir: "assets/juno-layers",
+           gaze: { eye: [784, 439], safe: ["neutral","talk","talk_half","happy","smug","sad","surprised","angry","proud"] },
            layers: ["hairback", "ponytail", "body", "bust", "whistle", "face", "hairfront"],
            mouth: { 1: "talk_half", 2: "talk" },
            stateMap: { closed_happy: "closedhappy", talk_half: "talkhalf", smug: "halflid" },
@@ -247,6 +383,7 @@ const CHARACTERS = {
              hairfront: [
                { tune: "hairFront", strip: [480, 630], anchor: [790, 300], dir: 90, segLen: 90, bandTop: 285, bandBottom: 648 } ] } },
   vesper:{ label: "Vesper", spriteDir: "assets/vesper", layerDir: "assets/vesper-layers",
+           gaze: { eye: [798, 343], safe: ["neutral","talk","talk_half","happy","smug","sad","surprised","angry","thinking","proud"] },
            layers: ["veil_a", "veil_b", "body", "bust", "choker", "face", "hairfront"],
            mouth: { 1: "talk_half", 2: "talk" },
            stateMap: { closed_happy: "closedhappy", talk_half: "talkhalf", smug: "halflid" },
@@ -270,6 +407,7 @@ const CHARACTERS = {
              hairfront: [
                { tune: "hairFront", strip: [550, 520], anchor: [800, 290], dir: 90, segLen: 90, bandTop: 260, bandBottom: 628 } ] } },
   mochi: { label: "Mochi", spriteDir: "assets/mochi", layerDir: "assets/mochi-layers",
+           gaze: { eye: [613, 371], safe: ["neutral","talk","talk_half","happy","smug","sad","surprised","angry","thinking","shy","proud"] },
            aspect: 1344 / 1728, canvas: [1344, 1728],
            layers: ["hairback", "tail", "body", "tag", "face", "hairfront"],
            mouth: { 1: "talk_half", 2: "talk" },
@@ -395,12 +533,37 @@ class Avatar {
     this.char = "paige"; this.mode = "layered";
     this.expression = "neutral"; this.talking = false;
     this.env = null;
-    this.nextBlink = performance.now() + 2600; this.blinkUntil = 0;
     this.gain = 1.0; this.prevEnv = 0;
     this.envSmooth = 0; this.bounceSm = 0; this._lastFace = "neutral";
     this.mouthLevel = 0;                            // graded mouth band 0/1/2
     this.blushO = 0; this.blushTarget = 0; this.blushEl = null;
-    this.nextMicro = 2500 + Math.random() * 2000;   // micro-impulse scheduler
+    /* Motion Pass 2 state. Blink machine (steal 1): phases
+       idle -> closing -> hold -> opening, times from BLINK_TUNING,
+       driven in tick; blinkEvents ring-logs starts for the suite. */
+    this.blinkPhase = "idle"; this.blinkT0 = 0;
+    this.nextBlinkAt = performance.now() + 1800 + Math.random() * 1500;
+    this.blinkEvents = []; this._blinkCount = 0; this._blinkQueued = false; this._openFlip = false;
+    this._nowMs = performance.now();
+    /* Squash spring (steal 3): a 2-DOF Spring whose x is sy toward
+       target 1; face pop (steal 5) is a RotSpring read as a scale. */
+    this.squash = new Spring(SQUASH_TUNING); this.squash.x = 1; this._squashPeak = 1;
+    this.facePop = new RotSpring(ANTICIPATION_TUNING.facePopOmega, ANTICIPATION_TUNING.facePopZeta);
+    this._sched = [];                               // timed beats (anticipation -> hop)
+    this.liftSm = 0;                                // talk-lift (steal 4), 0..1
+    /* Gaze (steal 6): external target {x, y, t} in normalized
+       stage space (+x viewer-right, +y down); the saccade sector
+       is one of "" (center) / e ne n nw w sw s se. */
+    this.gazeEl = null; this.rootEl = null; this.chainWraps = [];
+    this._gazeExt = null; this._gazePt = { x: 0, y: 0 }; this._gazeSector = "";
+    this._gazeNextAt = 0; this._gazeFollow = { x: 0, y: 0 };
+    this._gazeShown = null; this._gazeChangedAt = 0;
+    /* Idle scheduler (steal 7) + performance dynamics (steal 8). */
+    this._nextIdleAt = performance.now() + 2000; this._idleCd = {}; this._idleLog = [];
+    this._flickUntil = 0; this._deepStart = 0; this._deepUntil = 0;
+    this.envSlow = 0; this.dynGain = DYN_TUNING.base;
+    this._dynMin = DYN_TUNING.base; this._dynMax = DYN_TUNING.base;
+    this._escUsed = false; this._escHot = 0;
+    this.flags = { escalate: true };
     this.wag = null; this._wagEl = null;            // tail wag (driver->target)
     this.wagSpring = new RotSpring(18, 0.6);
     this.wagPhase = 0; this.wagHzSm = 0; this.wagAmpSm = 0; this.wagAngle = 0;
@@ -433,6 +596,9 @@ class Avatar {
     }
     const bl = new Image(); bl.src = `${C.layerDir}/${C.blush || "blush"}.${ext}`;
     if (C.jaw) { const jw = new Image(); jw.src = `${C.layerDir}/jaw.${ext}`; }
+    if (C.gaze) for (const d of ["e", "ne", "n", "nw", "w", "sw", "s", "se"]) {
+      const g = new Image(); g.src = `${C.layerDir}/faces/gaze_${d}.${ext}`;
+    }
   }
   build() {
     this.charEl.innerHTML = ""; this.layerEls = {}; this.spriteEl = null; this.faceEl = null;
@@ -446,12 +612,23 @@ class Avatar {
     for (const k of Object.keys(SPRING_TUNING))
       this.tuning[k] = { ...SPRING_TUNING[k], ...((SPRING_OVERRIDES[this.char] || {})[k] || {}) };
     this.preloadFaces(C);
+    /* Motion Pass 2: the whole figure hangs under one root wrapper
+       so squash & stretch (steal 3) and the breath stack's slow
+       rotation (steal 2) move her as one body; layers keep their
+       own springs inside it. Gaze state resets per character. */
+    const root = document.createElement("div");
+    root.dataset.layer = "root";
+    root.style.cssText = "position:absolute;inset:0;transform-origin:50% 100%;pointer-events:none;";
+    this.charEl.appendChild(root); this.rootEl = root;
+    this.chainWraps = []; this.gazeEl = null;
+    this._gazeSector = ""; this._gazeShown = null;
+    this._gazePt = { x: 0, y: 0 }; this._gazeFollow = { x: 0, y: 0 };
     if (this.mode === "sprite") {
       const bottom = document.createElement("img");
       bottom.className = "base"; bottom.alt = C.label;
       const top = document.createElement("img");
       top.alt = "";
-      this.charEl.appendChild(bottom); this.charEl.appendChild(top);
+      this.rootEl.appendChild(bottom); this.rootEl.appendChild(top);
       this.spriteStack = new FadeStack(bottom, top);
       this.spriteStack.set(`${C.spriteDir}/neutral.${C.ext || "png"}`, 0);
       this.spriteEl = bottom;
@@ -465,17 +642,25 @@ class Avatar {
       const under = document.createElement("img");
       under.src = `${C.spriteDir}/neutral.${C.ext || "png"}`;
       under.alt = ""; under.dataset.layer = "underlay";
-      this.charEl.appendChild(under); this.underlayEl = under;
+      this.rootEl.appendChild(under); this.underlayEl = under;
       for (const name of C.layers) {
         if (name === "face") {
           const bottom = document.createElement("img");
           bottom.alt = ""; bottom.dataset.layer = "face";
           const top = document.createElement("img");
           top.alt = ""; top.dataset.layer = "face";
-          this.charEl.appendChild(bottom); this.charEl.appendChild(top);
+          this.rootEl.appendChild(bottom); this.rootEl.appendChild(top);
           this.faceStack = new FadeStack(bottom, top);
           this.faceStack.set(`${C.layerDir}/faces/neutral.${C.ext || "png"}`, 0);
           this.faceEl = bottom;
+          if (C.gaze) {        // gaze patch (steal 6): above the face,
+            const gz = document.createElement("img");   // under the blush
+            gz.alt = ""; gz.dataset.layer = "gaze";
+            const gc = C.canvas || [1600, 1600];
+            gz.style.transformOrigin = `${(C.gaze.eye[0] / gc[0] * 100).toFixed(1)}% ${((C.gaze.eye[1] + 110) / gc[1] * 100).toFixed(1)}%`;
+            gz.style.opacity = "0"; gz.style.pointerEvents = "none";
+            this.rootEl.appendChild(gz); this.gazeEl = gz;
+          }
           this._addBlush(C);   // blush rides above the face, under front hair
           if (C.jaw) {         // two-piece mouth: jaw patch above the face
             const jw = document.createElement("img");
@@ -483,7 +668,7 @@ class Avatar {
             jw.alt = ""; jw.dataset.layer = "jaw";
             jw.style.transformOrigin = C.jaw.pivot;
             jw.style.opacity = "0"; jw.style.pointerEvents = "none";
-            this.charEl.appendChild(jw); this.jawEl = jw;
+            this.rootEl.appendChild(jw); this.jawEl = jw;
           }
           continue;
         }
@@ -495,7 +680,11 @@ class Avatar {
           const wrap = document.createElement("div");
           wrap.className = "chainWrap"; wrap.dataset.layer = name;
           wrap.style.cssText = "position:absolute;inset:0;pointer-events:none;";
-          this.charEl.appendChild(wrap);
+          /* Squash pivots the wrap at the chain's own anchor, so a
+             chained appendage stretches around its root (steal 3). */
+          const gc2 = C.canvas || [1600, 1600], g0 = C.chains[name][0];
+          wrap.style.transformOrigin = `${(g0.anchor[0] / gc2[0] * 100).toFixed(1)}% ${(g0.anchor[1] / gc2[1] * 100).toFixed(1)}%`;
+          this.rootEl.appendChild(wrap); this.chainWraps.push(wrap);
           this._pendingChains.push({ name, wrap, geoms: C.chains[name] });
           continue;
         }
@@ -503,7 +692,7 @@ class Avatar {
         img.src = `${C.layerDir}/${name}.${C.ext || "png"}`;
         img.alt = ""; img.dataset.layer = name;
         if (C.pivots[name]) img.style.transformOrigin = C.pivots[name];
-        this.charEl.appendChild(img); this.layerEls[name] = img;
+        this.rootEl.appendChild(img); this.layerEls[name] = img;
       }
       for (const p of this._pendingChains) this._loadChains(p, C, buildSeq);
       this.springs = { body: new Spring(SPRING_TUNING.body) };
@@ -522,7 +711,7 @@ class Avatar {
                          : { omega: 10.0, zeta: 0.45, gainX: 1.0, gainY: 1.0, rot: 0.0 };
         const spec = { ...base, ...((C.layerSprings || {})[name] || {}) };
         const spr = new Spring(spec);
-        this._springLayers.push({ el: this.layerEls[name], spr, tune: spec });
+        this._springLayers.push({ el: this.layerEls[name], spr, tune: spec, name });
         if (key) this.springs[key] = spr;
         this.springs[name] = spr;
       }
@@ -584,7 +773,7 @@ class Avatar {
     img.src = `${C.layerDir}/${C.blush || "blush"}.${C.ext || "png"}`;
     img.alt = ""; img.dataset.layer = "blush";
     img.style.opacity = "0"; img.style.pointerEvents = "none";
-    this.charEl.appendChild(img); this.blushEl = img;
+    this.rootEl.appendChild(img); this.blushEl = img;
   }
   /* Wag hook: enable the tail-wag driver on a layer (Milo's tail once
      his set lands; the player's demo toggle points it at Clementine's
@@ -625,27 +814,94 @@ class Avatar {
        envelope, exactly as the bands use it. */
     if (this.jawActive()) return "talk";
     if (this.mouthLevel > 0) return this.mouthName(this.mouthLevel);
-    if (performance.now() < this.blinkUntil) return "blink";
+    if (this._eyeClosed()) return "blink";
     return this.expression;
+  }
+  /* The settled face with blink factored out — the gaze patch's
+     safety list is written against these names. */
+  _baseFace() {
+    if (this.jawActive()) return "talk";
+    if (this.mouthLevel > 0) return this.mouthName(this.mouthLevel);
+    return this.expression;
+  }
+  _eyeClosed() {
+    if (this.blinkPhase === "closing" || this.blinkPhase === "hold") return true;
+    if (this.blinkPhase === "opening") return (this._nowMs - this.blinkT0) < BLINK_TUNING.openMs * 0.5;
+    return false;
+  }
+  /* Blink machine (steal 1): Cubism phase times; a jaw character's
+     blink waits for her mouth to shut (retry in 250 ms) — the old
+     rule, kept. Triggered blinks queue behind an active one. */
+  _startBlink(now, why) {
+    if (CHARACTERS[this.char].jaw && this.mouthLevel > 0) { this.nextBlinkAt = now + 250; return; }
+    this.blinkPhase = "closing"; this.blinkT0 = now; this._openFlip = false;
+    this.blinkEvents.push({ t: Math.round(now), why });
+    if (this.blinkEvents.length > 40) this.blinkEvents.shift();
+    this._blinkCount++;
+    if (why === "auto" && Math.random() < BLINK_TUNING.doubleChance) this._blinkQueued = true;
+    this.applyExpression();
+  }
+  triggerBlink() {
+    const now = performance.now();
+    if (this.blinkPhase === "idle") this._startBlink(now, "trigger");
+    else this._blinkQueued = true;
+  }
+  _blinkStep(now) {
+    const B = BLINK_TUNING;
+    if (this.blinkPhase === "idle") {
+      if (now >= this.nextBlinkAt) this._startBlink(now, "auto");
+      return;
+    }
+    const el = now - this.blinkT0;
+    if (this.blinkPhase === "closing" && el >= B.closeMs) { this.blinkPhase = "hold"; this.blinkT0 = now; }
+    else if (this.blinkPhase === "hold" && el >= B.holdMs) { this.blinkPhase = "opening"; this.blinkT0 = now; }
+    else if (this.blinkPhase === "opening") {
+      if (!this._openFlip && el >= B.openMs * 0.5) { this._openFlip = true; this.applyExpression(); }
+      if (el >= B.openMs) {
+        this.blinkPhase = "idle";
+        if (this._blinkQueued) { this._blinkQueued = false; this._startBlink(now, "double"); }
+        else this.nextBlinkAt = now + Math.max(B.intervalMinMs, 2 * B.intervalMeanMs * Math.random());
+      }
+    }
   }
   applyExpression() {
     const C = CHARACTERS[this.char], face = this.currentFace();
-    // Blinks are quick (45 ms); mouth-band swaps snappy (50 ms);
-    // expression swaps get the full ~90 ms.
-    const isMouth = face.startsWith("talk") || this._lastFace.startsWith("talk");
-    const fade = (face === "blink" || this._lastFace === "blink") ? 45 : isMouth ? 50 : 90;
+    // Crossfade times are per-expression data now (steal 4,
+    // EXPR_MOTION): surprise snaps in ~60 ms, shy creeps in
+    // ~250 ms, mouth bands stay snappy, blinks quickest.
+    const rowFade = (EXPR_MOTION[face] || {}).fade;
+    const fade = (face === "blink" || this._lastFace === "blink") ? 40 : (rowFade != null ? rowFade : 90);
     this._lastFace = face;
     if (this.mode === "sprite" && this.spriteStack) this.spriteStack.set(`${C.spriteDir}/${stateFile(C, face)}.${C.ext || "png"}`, fade);
     if (this.mode === "layered" && this.faceStack) this.faceStack.set(`${C.layerDir}/faces/${stateFile(C, face)}.${C.ext || "png"}`, fade);
   }
   setExpression(name, withImpulse = true) {
+    const changed = name !== this.expression;
     this.expression = name; this.applyExpression();
     this.blushTarget = BLUSH_LEVEL[name] ?? 0;
     if (withImpulse) this.impulse(0, -46);
+    if (changed) {
+      /* Steals 1 + 5: a face change pops (Penner-flavored scale
+         spring) and usually blinks — people blink when their
+         expression changes. */
+      this.facePop.v += 16;
+      if (Math.random() < BLINK_TUNING.onExprChance) this.triggerBlink();
+    }
     this.log("expression", { name });
   }
-  impulse(vx, vy) {
+  /* The current expression's motion gain (steal 4): the row's gain
+     times the character's scale. Every impulse is multiplied by
+     it; speech-driven impulses additionally ride the performance
+     dynamics (steal 8) when the caller passes { dyn: true }. */
+  exprGain() {
+    return ((EXPR_MOTION[this.expression] || {}).gain ?? 1) * (EXPR_CHAR_SCALE[this.char] ?? 1);
+  }
+  impulse(vx, vy, opts) {
     if (this.mode !== "layered") return;
+    /* Steal 1: a strong lean draws a blink, like a head turn does. */
+    if (Math.hypot(vx, vy) >= BLINK_TUNING.leanMin && Math.random() < BLINK_TUNING.onLeanChance) this.triggerBlink();
+    const scale = this.exprGain() * (opts && opts.dyn ? this.dynGain : 1);
+    vx *= scale; vy *= scale;
     const s = this.springs;
     if (s.hairBack) s.hairBack.kick(vx * 0.7, vy * 0.7);
     if (s.hairFront) s.hairFront.kick(vx * 0.85, vy * 0.85);
@@ -664,9 +920,176 @@ class Avatar {
     if (kv) for (const rec of this.chains)
       rec.chain.kick(kv * (rec.geom.kickGain == null ? (rec.geom.wag ? 0.5 : 1) : rec.geom.kickGain));
   }
+  /* Anticipation (steal 5): a 60-100 ms counter-dip + a blink,
+     then the real move lands — hops and laughs read twice as big
+     for the price of a 34 px dip. */
+  anticipateDip() {
+    this.impulse(0, ANTICIPATION_TUNING.dipVy, { dyn: false });
+    this.squash.vx += SQUASH_TUNING.dipKick;
+    this.triggerBlink();
+  }
+  hop(strength = 1) {
+    this.anticipateDip();
+    const at = performance.now() + ANTICIPATION_TUNING.dipMs;
+    this._sched.push({ at, fn: () => {
+      this.impulse(0, -190 * strength, { dyn: false });
+      this.squash.vx += SQUASH_TUNING.hopKick * strength;
+    } });
+  }
+  /* Gaze (steal 6): the demo points her at the visitor's cursor;
+     anything else may point her anywhere in normalized stage
+     space. With no fresh target she drifts on her own saccades. */
+  setGazeTarget(x, y) {
+    const cl = (v) => Math.max(-1, Math.min(1, v));
+    this._gazeExt = { x: cl(x), y: cl(y), t: performance.now() };
+    this._gazeNextAt = Math.min(this._gazeNextAt, performance.now() + 30);
+  }
+  releaseGaze() { this._gazeExt = null; }
+  gazeToward(clientX, clientY) {
+    const C = CHARACTERS[this.char];
+    if (!C.gaze || !this.charEl.clientWidth) return;
+    const r = this.charEl.getBoundingClientRect();
+    const cvs = C.canvas || [1600, 1600];
+    const ex = r.left + (C.gaze.eye[0] / cvs[0]) * r.width;
+    const ey = r.top + (C.gaze.eye[1] / cvs[1]) * r.height;
+    this.setGazeTarget((clientX - ex) / (r.width * 0.6), (clientY - ey) / (r.height * 0.6));
+  }
+  _gazeStep(now, dt) {
+    const G = GAZE_TUNING, C = CHARACTERS[this.char];
+    if (!this.gazeEl || !C.gaze) return;
+    const extFresh = this._gazeExt && (now - this._gazeExt.t) <= G.staleMs;
+    if (now >= this._gazeNextAt) {
+      let gx, gy;
+      if (extFresh) { gx = this._gazeExt.x; gy = this._gazeExt.y; }
+      else {
+        const a = Math.random() * Math.PI * 2, r = Math.random() * G.driftRadius;
+        gx = Math.cos(a) * r; gy = Math.sin(a) * r * 0.7;
+      }
+      const mag = Math.hypot(gx, gy);
+      let sector = "";
+      if (mag >= G.centerDead) {
+        const names = ["e", "se", "s", "sw", "w", "nw", "n", "ne"];
+        sector = names[((Math.round(Math.atan2(gy, gx) / (Math.PI / 4)) % 8) + 8) % 8];
+      }
+      if (sector !== this._gazeSector) {
+        const jump = Math.hypot(gx - this._gazePt.x, gy - this._gazePt.y);
+        this._gazeSector = sector; this._gazeChangedAt = now;
+        if (jump > G.bigSaccade && Math.random() < 0.5) this.triggerBlink();
+      }
+      this._gazePt = { x: gx, y: gy };
+      this._gazeNextAt = now + G.holdMinMs + Math.random() * (G.holdMaxMs - G.holdMinMs);
+    }
+    /* Head follow: a one-pole at the 100-200 ms lag toward the
+       gaze point scaled to head travel (followPx ~ 14 px max eye
+       travel x 0.35 coupling, research §2.5). */
+    const k = 1 - Math.exp(-dt / (G.followLagMs / 1000));
+    this._gazeFollow.x += (this._gazePt.x * G.followPx - this._gazeFollow.x) * k;
+    this._gazeFollow.y += (this._gazePt.y * G.followPx - this._gazeFollow.y) * k;
+    /* The patch shows only over a graded-safe settled face, only
+       for a real sector, and never over a closing eye. */
+    const show = this._gazeSector !== "" && C.gaze.safe.includes(this._baseFace()) && !this._eyeClosed();
+    const want = show ? `${C.layerDir}/faces/gaze_${this._gazeSector}.${C.ext || "png"}` : null;
+    if (want !== this._gazeShown) {
+      this._gazeShown = want;
+      if (want) { this.gazeEl.src = want; this.gazeEl.style.opacity = "1"; }
+      else this.gazeEl.style.opacity = "0";
+    }
+  }
+  /* Idle scheduler (steal 7): Shimeji grammar — weighted random
+     acts, per-act cooldowns, hard conditions. Fires only in the
+     quiet between lines; the act log is the suite's evidence. */
+  _idleCfg() {
+    const c = IDLE_TUNING.chars[this.char];
+    const weights = {};
+    for (const [a, row] of Object.entries(IDLE_TUNING.acts)) weights[a] = (c && c.acts && c.acts[a] != null) ? c.acts[a] : row.w;
+    return { gap: (c && c.gapMs) || IDLE_TUNING.gapMs, weights };
+  }
+  _idleStep(now) {
+    if (now < this._nextIdleAt) return;
+    const cfg = this._idleCfg();
+    this._nextIdleAt = now + cfg.gap[0] + Math.random() * (cfg.gap[1] - cfg.gap[0]);
+    if (this.talking || this.env || this.envSmooth > 0.02) return;
+    const S = this.springs;
+    const pool = [];
+    for (const [act, w] of Object.entries(cfg.weights)) {
+      if (w <= 0) continue;
+      if (now - (this._idleCd[act] || 0) < ((IDLE_TUNING.acts[act] || {}).cdMs || 0)) continue;
+      if (act === "tailflick" && !(this.chains.some((r) => r.geom.wag) && this.wagClass() === "idle")) continue;
+      if (act === "hairfix" && !(S.hairFront || this.chains.some((r) => r.name === "hairfront"))) continue;
+      if (this.expression === "sad" && act !== "breath") continue;
+      pool.push([act, w]);
+    }
+    if (!pool.length) return;
+    let sum = 0; for (const [, w] of pool) sum += w;
+    let r = Math.random() * sum, act = pool[0][0];
+    for (const [a, w] of pool) { r -= w; if (r <= 0) { act = a; break; } }
+    this._idleCd[act] = now;
+    this._idleLog.push({ act, t: Math.round(now) });
+    if (this._idleLog.length > 30) this._idleLog.shift();
+    const g = this.gain;
+    if (act === "sway") {
+      const ms = g;
+      if (S.hairBack) S.hairBack.kick((Math.random() - 0.5) * 56 * ms, -(4 + Math.random() * 12) * ms);
+      if (S.hairFront) S.hairFront.kick((Math.random() - 0.5) * 34 * ms, -(3 + Math.random() * 8) * ms);
+      if (S.ribbon) S.ribbon.kick((Math.random() - 0.5) * 78 * ms, -(5 + Math.random() * 14) * ms);
+      if (S.bust) S.bust.kick(0, -(3 + Math.random() * 6) * ms);
+      if (S.ponytail) S.ponytail.kick((Math.random() - 0.5) * 60 * ms, -(4 + Math.random() * 12) * ms);
+      if (S.veil_b) S.veil_b.kick((Math.random() - 0.5) * 64 * ms, -(4 + Math.random() * 10) * ms);
+      for (const rec of this.chains) {
+        if (rec.geom.wag) continue;
+        rec.chain.kick((Math.random() - 0.5) * 56 * ms * CHAIN_KICK.x * 0.8);
+      }
+    } else if (act === "look") {
+      const a = Math.random() * Math.PI * 2, rr = 0.7 + Math.random() * 0.3;
+      this._gazeExt = { x: Math.cos(a) * rr, y: Math.sin(a) * rr * 0.7, t: now };
+      this._gazeNextAt = Math.min(this._gazeNextAt, now + 30);
+    } else if (act === "hairfix") {
+      if (S.hairFront) S.hairFront.kick((Math.random() - 0.5) * 30 * g, -26 * g);
+      for (const rec of this.chains) if (rec.name === "hairfront") rec.chain.kick(0.25 * g * (Math.random() < 0.5 ? -1 : 1));
+      this.triggerBlink();
+    } else if (act === "stretch") {
+      this.squash.vx += SQUASH_TUNING.actKick;
+      this.impulse(0, -30, { dyn: false });
+    } else if (act === "breath") {
+      this._deepStart = now; this._deepUntil = now + BREATH_TUNING.deepMs;
+    } else if (act === "tailflick") {
+      this._flickUntil = now + 1300;
+    }
+    this.log("idle", { act });
+  }
+  breathBoost(now) {
+    if (now >= this._deepUntil) return 1;
+    const p = Math.min(1, Math.max(0, (now - this._deepStart) / BREATH_TUNING.deepMs));
+    return 1 + BREATH_TUNING.deepBoost * Math.sin(Math.PI * p);
+  }
+  /* Verification hooks (Motion Pass 2 suite): measured state for
+     blink timing, breath, squash, gaze, idle and dynamics. */
+  debugBlink() {
+    const iv = [];
+    for (let i = 1; i < this.blinkEvents.length; i++) iv.push(this.blinkEvents[i].t - this.blinkEvents[i - 1].t);
+    return { count: this._blinkCount, phase: this.blinkPhase,
+             intervals: iv.slice(-12), events: this.blinkEvents.slice(-8) };
+  }
+  debugGaze() {
+    return { sector: this._gazeSector, pt: { x: +this._gazePt.x.toFixed(2), y: +this._gazePt.y.toFixed(2) },
+             follow: { x: +this._gazeFollow.x.toFixed(2), y: +this._gazeFollow.y.toFixed(2) },
+             shown: this._gazeShown, changedAt: this._gazeChangedAt };
+  }
+  debugMotion() {
+    const peak = this._squashPeak; this._squashPeak = this.squash.x;
+    return { blink: this.debugBlink(), gaze: this.debugGaze(),
+             breathAmp: BREATH_TUNING.amp[this.char] ?? 1,
+             squash: { now: +this.squash.x.toFixed(3), peak: +peak.toFixed(3) },
+             idle: this._idleLog.slice(-12),
+             perf: { dynGain: +this.dynGain.toFixed(3), dynMin: +this._dynMin.toFixed(3),
+                     dynMax: +this._dynMax.toFixed(3), envSlow: +this.envSlow.toFixed(3) },
+             lift: +this.liftSm.toFixed(3), exprGain: +this.exprGain().toFixed(3) };
+  }
+  debugPerf() { return this.debugMotion().perf; }
   async playLine(url) {
     const env = await loadEnvelope(url);
     this.env = env;
+    this._escUsed = false; this._escHot = 0;   // per-line escalation budget (steal 8)
     this.voiceEl.src = url;
     await this.voiceEl.play().catch(() => {});
     this.log("speech-start", { url });
@@ -701,8 +1124,28 @@ class Avatar {
     else if (env < LO - 0.04) ml = 0; else if (env < HI - 0.07) ml = 1;
     if (ml !== this.mouthLevel) { this.mouthLevel = ml; this.applyExpression(); }
     this.talking = ml > 0;
-    if (now > this.nextBlink) { this.blinkUntil = now + 140; this.nextBlink = now + 2200 + Math.random() * 3000; this.applyExpression(); }
-    if (this.blinkUntil && now > this.blinkUntil && !this.talking) { this.blinkUntil = 0; this.applyExpression(); }
+    this._nowMs = now;
+    this._blinkStep(now);
+    /* Timed beats (anticipation -> hop landing, steal 5). */
+    for (let i = this._sched.length - 1; i >= 0; i--)
+      if (now >= this._sched[i].at) { const s = this._sched.splice(i, 1)[0]; s.fn(); }
+    /* Performance dynamics (steal 8): the slowed envelope scales
+       speech-driven motion; a sustained peak on a happy face may
+       escalate the expression one notch, once per line. */
+    this.envSlow += (env - this.envSlow) * (1 - Math.exp(-dt / (DYN_TUNING.tcMs / 1000)));
+    this.dynGain = DYN_TUNING.base + DYN_TUNING.span * this.envSlow;
+    if (this.dynGain < this._dynMin) this._dynMin = this.dynGain;
+    if (this.dynGain > this._dynMax) this._dynMax = this.dynGain;
+    if (this.flags.escalate && this.talking && this.expression === "happy" && !this._escUsed) {
+      if (this.envSlow > DYN_TUNING.escHot) {
+        this._escHot += dt * 1000;
+        if (this._escHot >= DYN_TUNING.escHoldMs) { this._escUsed = true; this.setExpression("closed_happy", false); }
+      } else this._escHot = 0;
+    } else this._escHot = 0;
+    /* Talk-lift (steal 4): the head rises while she speaks. */
+    this.liftSm += ((this.talking ? 1 : 0) - this.liftSm) *
+      (1 - Math.exp(-dt / ((this.talking ? LIFT_TUNING.attackMs : LIFT_TUNING.releaseMs) / 1000)));
+    this._gazeStep(now, dt);
     if (this.spriteStack) this.spriteStack.update(dt);
     if (this.faceStack) this.faceStack.update(dt);
     if (this.blushEl) {   // dynamic blush: ease toward the expression's level
@@ -711,13 +1154,35 @@ class Avatar {
       this.blushEl.style.opacity = this.blushO.toFixed(3);
     }
     const t = now / 1000;
-    const mx = Math.sin(t * 0.9) * 2.1 * this.gain;
+    /* Breath stack (steal 2): four incommensurate sines replace the
+       old two-sine sway — the root pair lands here as the spring
+       targets; the face sine and the slow rotation join at the
+       transform stage below. */
+    const bAmp = (BREATH_TUNING.amp[this.char] ?? 1) * this.breathBoost(now);
+    const brX = Math.sin(t * 2 * Math.PI / BREATH_TUNING.rootX.period + BREATH_TUNING.rootX.phase) * BREATH_TUNING.rootX.amp * bAmp;
+    const brY = Math.sin(t * 2 * Math.PI / BREATH_TUNING.rootY.period + BREATH_TUNING.rootY.phase) * BREATH_TUNING.rootY.amp * bAmp;
+    this._brF = Math.sin(t * 2 * Math.PI / BREATH_TUNING.faceY.period + BREATH_TUNING.faceY.phase) * BREATH_TUNING.faceY.amp * bAmp;
+    this._brRot = Math.sin(t * 2 * Math.PI / BREATH_TUNING.rootR.period + BREATH_TUNING.rootR.phase) * BREATH_TUNING.rootR.amp * bAmp;
+    this._brY = brY;
+    const mx = brX * this.gain;
     /* Speech bounce eased through a ~70 ms one-pole on top of the
        smoothed envelope — continuous in and out, no linear segments. */
     this.bounceSm += ((-env * 13) - this.bounceSm) * (1 - Math.exp(-dt / 0.07));
-    const my = (Math.sin(t * 1.55) * 1.15 + this.bounceSm) * this.gain;
-    if (env > 0.30 && this.prevEnv <= 0.30 && this.mode === "layered") this.impulse(0, -52 * this.gain);
+    const my = (brY + this.bounceSm) * this.gain;
+    if (env > 0.30 && this.prevEnv <= 0.30 && this.mode === "layered") this.impulse(0, -52 * this.gain, { dyn: true });
     this.prevEnv = env;
+    /* Squash & stretch (steal 3): sy springs toward 1 + a speech
+       swell (envelope x expression gain x performance dynamics),
+       hard-clamped to the ceiling; the root wrapper applies the
+       volume-conserving scale and the breath stack's slow
+       rotation in both modes. */
+    this.squash.step(dt, 1 + env * SQUASH_TUNING.speechGain * this.exprGain() * this.dynGain, 0);
+    if (this.squash.x > SQUASH_TUNING.max) this.squash.x = SQUASH_TUNING.max;
+    if (this.squash.x < SQUASH_TUNING.min) this.squash.x = SQUASH_TUNING.min;
+    if (this.squash.x > this._squashPeak) this._squashPeak = this.squash.x;
+    const sy = this.squash.x, sxr = 1 / Math.sqrt(sy);
+    if (this.rootEl) this.rootEl.style.transform =
+      `rotate(${(this._brRot || 0).toFixed(3)}deg) scale(${sxr.toFixed(4)}, ${sy.toFixed(4)})`;
     if (this.mode === "sprite") {
       const s = this.spriteSpring;
       s.step(dt, mx, my);
@@ -729,25 +1194,10 @@ class Avatar {
       return;
     }
     const S = this.springs, body = S.body;
-    /* Micro-impulse scheduler (the blink scheduler's sibling): small
-       randomized spring kicks to hair/ribbon/bust so she idles alive
-       between beats. Half strength while talking. */
-    if (now >= this.nextMicro) {
-      this.nextMicro = now + 1600 + Math.random() * 3200;
-      const ms = (this.talking ? 0.5 : 1.0) * this.gain;
-      if (S.hairBack) S.hairBack.kick((Math.random() - 0.5) * 56 * ms, -(4 + Math.random() * 12) * ms);
-      if (S.hairFront) S.hairFront.kick((Math.random() - 0.5) * 34 * ms, -(3 + Math.random() * 8) * ms);
-      if (S.ribbon) S.ribbon.kick((Math.random() - 0.5) * 78 * ms, -(5 + Math.random() * 14) * ms);
-      if (S.bust) S.bust.kick(0, -(3 + Math.random() * 6) * ms);
-      if (S.ponytail) S.ponytail.kick((Math.random() - 0.5) * 60 * ms, -(4 + Math.random() * 12) * ms);
-      if (S.veil_b) S.veil_b.kick((Math.random() - 0.5) * 64 * ms, -(4 + Math.random() * 10) * ms);
-      /* Micro-kicks reach chained hair at low gain (INTEGRATION point
-         6); tails are excluded — the wag driver owns their targets. */
-      for (const rec of this.chains) {
-        if (rec.geom.wag) continue;
-        rec.chain.kick((Math.random() - 0.5) * 56 * ms * CHAIN_KICK.x * 0.8);
-      }
-    }
+    /* Idle behavior scheduler (steal 7): the old micro-impulse
+       scheduler grew up into the Shimeji grammar — the sway act
+       inside it IS the old micro-kick, at the same density. */
+    this._idleStep(now);
     /* Tail-wag driver: resolves the emotion class, eases hz/amp, and
        writes ONLY the wag spring's target angle (one-writer law). */
     if (this.wag) {
@@ -768,20 +1218,37 @@ class Avatar {
       this.wagAngle = this.wagSpring.a;
     }
     body.step(dt, mx, my);
-    const set = (el, spr, tune) => {
+    const Kdisp = (this.charEl.clientHeight || 1600) / ((CHARACTERS[this.char].canvas || [1600, 1600])[1]);
+    const liftPx = this.liftSm * LIFT_TUNING.px * Kdisp;
+    const set = (el, spr, tune, name) => {
       if (!el || !spr) return;
       spr.step(dt, mx * tune.gainX * this.gain, my * tune.gainY * this.gain);
       let x = spr.x, y = spr.y;
       if (tune.clamp) { x = Math.max(-tune.clamp, Math.min(tune.clamp, x)); y = Math.max(-tune.clamp, Math.min(tune.clamp, y)); }
       let rot = Math.max(-7, Math.min(7, -spr.vx * 0.028 * tune.rot));
       if (this.wag && el === this._wagEl) rot = this.wagAngle;  // wag spring owns this layer's rotation
-      el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${rot.toFixed(2)}deg)`;
+      if (tune.lift) y -= liftPx * tune.lift;                  // talk-lift stirs the hair (steal 4)
+      if (name === "bust") y += (this._brY || 0) * BREATH_TUNING.bustShare;  // the bust breathes (steal 2)
+      const sg = SQUASH_TUNING.stretchGain[name] ?? 0.3;       // per-layer stretch gain (steal 3)
+      const lsy = 1 + (sy - 1) * sg, lsx = 1 / Math.sqrt(lsy);
+      el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${rot.toFixed(2)}deg) scale(${lsx.toFixed(4)}, ${lsy.toFixed(4)})`;
     };
     const bt = `translate(${body.x.toFixed(1)}px, ${body.y.toFixed(1)}px)`;
     if (this.underlayEl) this.underlayEl.style.transform = bt;
     if (this.layerEls.body) this.layerEls.body.style.transform = bt;
-    if (this.faceStack) for (const el of this.faceStack.els) el.style.transform = bt; // face locked to the head
-    if (this.blushEl) this.blushEl.style.transform = bt;
+    /* The face GROUP (face stack + gaze patch + blush; the jaw is
+       prefixed with the same transform below): body-locked, plus
+       the talk-lift, the breath stack's face sine, the gaze
+       head-follow and the expression pop — the head leads, the
+       body follows (steals 2 / 4 / 5 / 6). */
+    this.facePop.step(dt, 0);
+    const popS = 1 + this.facePop.a * 0.045;
+    const fx = (this._gazeFollow.x || 0) * Kdisp;
+    const fy = (this._gazeFollow.y || 0) * Kdisp - liftPx + (this._brF || 0);
+    const faceTf = bt + ` translate(${fx.toFixed(1)}px, ${fy.toFixed(1)}px) scale(${popS.toFixed(4)})`;
+    if (this.faceStack) for (const el of this.faceStack.els) el.style.transform = faceTf; // face locked to the head
+    if (this.gazeEl) this.gazeEl.style.transform = faceTf;
+    if (this.blushEl) this.blushEl.style.transform = faceTf;
     /* Two-piece jaw: aperture eased from the smoothed envelope, angle
        through its own spring (lag + a whisper of overshoot). */
     const CJ = CHARACTERS[this.char];
@@ -793,10 +1260,10 @@ class Avatar {
       this.jawA += (aT - this.jawA) * (1 - Math.exp(-dt / tcJ));
       this.jawSpring.step(dt, this.jawA * CJ.jaw.maxDeg);
       this.jawEl.style.opacity = (this.mouthLevel > 0 || this.jawA > 0.01 || this.debugJaw) ? "1" : "0";
-      this.jawEl.style.transform = bt + ` rotate(${this.jawSpring.a.toFixed(2)}deg) translateY(${(this.jawA * 7).toFixed(1)}px)`;
+      this.jawEl.style.transform = faceTf + ` rotate(${this.jawSpring.a.toFixed(2)}deg) translateY(${(this.jawA * 7).toFixed(1)}px)`;
       if (this.mouthLevel === 0 && prevA >= 0.03 && this.jawA < 0.03) this.applyExpression();
     }
-    for (const L of this._springLayers) set(L.el, L.spr, L.tune);
+    for (const L of this._springLayers) set(L.el, L.spr, L.tune, L.name);
     /* Chains (INTEGRATION merge point 3): each chain's anchor follows
        the body spring's displacement (read from the spring, never the
        DOM), converted from display px to native px; the fixed-step
@@ -809,7 +1276,14 @@ class Avatar {
       const CC = CHARACTERS[this.char], cvs = CC.canvas || [1600, 1600];
       const Kx = cvs[0] / (this.charEl.clientWidth || cvs[0]);
       const Ky = cvs[1] / (this.charEl.clientHeight || cvs[1]);
-      const wagCls = this.wagClass();
+      const wagCls = now < this._flickUntil ? "excited" : this.wagClass();
+      for (const p of this._pendingChains) {
+        /* Squash on the wrap, pivoting at the chain's anchor —
+           chained hair/tails stretch around their roots (steal 3). */
+        const sgw = SQUASH_TUNING.stretchGain[p.name] ?? 0.6;
+        const wsy = 1 + (sy - 1) * sgw;
+        p.wrap.style.transform = `scale(${(1 / Math.sqrt(wsy)).toFixed(4)}, ${wsy.toFixed(4)})`;
+      }
       for (const rec of this.chains) {
         rec.chain.setAnchor(rec.restAnchor.x + body.x * Kx, rec.restAnchor.y + body.y * Ky);
         if (rec.geom.wag) rec.chain.setWag(wagCls);
@@ -820,5 +1294,6 @@ class Avatar {
   }
 }
 
-window.PresenceStage = { Avatar, loadEnvelope, SPRING_TUNING, SPRING_OVERRIDES, WAG_TUNING, BLUSH_LEVEL, EXPRESSIONS, CHARACTERS, BUCKETS_PER_SEC };
+window.PresenceStage = { Avatar, loadEnvelope, SPRING_TUNING, SPRING_OVERRIDES, WAG_TUNING, BLUSH_LEVEL, EXPRESSIONS, CHARACTERS, BUCKETS_PER_SEC,
+  BLINK_TUNING, BREATH_TUNING, SQUASH_TUNING, EXPR_MOTION, EXPR_CHAR_SCALE, LIFT_TUNING, GAZE_TUNING, IDLE_TUNING, DYN_TUNING, ANTICIPATION_TUNING };
 })();
