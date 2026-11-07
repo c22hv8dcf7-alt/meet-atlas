@@ -21,6 +21,16 @@
      face      LOCKED to the body spring (no facial sliding, ever)
    Gains multiply the shared performance target per layer; rotation is
    driven by each spring's own x-velocity (pendulum read).
+
+   PRESENTATION SMOOTHING (not physics — the springs above are the law
+   and are untouched): face swaps crossfade over ~90 ms (45 ms for
+   blinks) on a two-plate stack whose opacity is driven from this
+   engine's own tick, never a CSS transition, so the fade follows the
+   stage clock frame-for-frame; the RMS lip-sync envelope is one-pole
+   smoothed (fast attack ~15 ms, release ~120 ms) so the mouth no
+   longer jitters bucket-to-bucket and talk state holds through
+   syllable gaps; the speech bounce reads that smoothed envelope
+   through a further ~70 ms ease, so it has no linear segments.
    ===================================================================== */
 const SPRING_TUNING = {
   body:      { omega: 11.0, zeta: 0.55, gainX: 1.00, gainY: 1.00, rot: 0.00 },
@@ -28,15 +38,65 @@ const SPRING_TUNING = {
   hairBack:  { omega:  9.5, zeta: 0.42, gainX: 1.50, gainY: 1.35, rot: 0.55 },
   hairFront: { omega: 10.5, zeta: 0.46, gainX: 1.15, gainY: 1.10, rot: 0.30 },
   ribbon:    { omega:  9.5, zeta: 0.40, gainX: 1.90, gainY: 1.60, rot: 1.60 },
+  tail:      { omega: 10.0, zeta: 0.45, gainX: 0.90, gainY: 0.80, rot: 0.00 },
 };
-const EXPRESSIONS = ["neutral", "happy", "sad", "surprised", "angry", "thinking", "shy", "proud"];
+/* Per-character presentation overrides — DATA, merged over SPRING_TUNING
+   per layer at build time. Only gains and travel clamp live here;
+   omega/zeta (the settle law) are never overridden. The bust values are
+   sized so the bounce READS at stage scale: at the 1600px native canvas
+   the old +/-7px clamp shrank to ~3px on a 720p stage — invisible.
+   Paige is the cast's most restrained (+/-16 native px); Clementine's
+   is the highest by design (+/-20, with an extra-wide patch feather so
+   the travel never shows a plate edge). The bust spring still only ever
+   follows the shared performance target + sanctioned impulses — no
+   driver ever writes it. */
+const SPRING_OVERRIDES = {
+  paige: { bust: { gainX: 0.50, gainY: 1.00, clamp: 16 } },
+  clem:  { bust: { gainX: 0.65, gainY: 1.10, clamp: 20 } },
+};
+/* Tail-wag tuning — per-character DATA (the cast-tuning hook). The wag
+   driver writes only the tail spring's TARGET (an oscillating angle);
+   the spring itself still owns the motion — one-writer law preserved.
+   Classes resolve from the active expression (+ talking state):
+     excited  happy/proud/sparkle/closed-happy/wink — fast + wide
+     talking  mouth moving, any expression          — gentle
+     idle     everything else                       — slow sway BURSTS
+                                                      with quiet gaps
+     shy      slow + small · sad — droop (hangs, wag off)
+     angry    stiff, tiny fast tip-twitch
+   amp is normalized (1.0 = the full +/-16 deg stage swing); droop is a
+   constant hang angle in degrees. Milo's row is his design data,
+   ready for his asset set; his CHARACTERS entry arrives with it. */
+const WAG_TUNING = {
+  default: {
+    excited: { hz: 2.3, amp: 1.00 }, talking: { hz: 1.2, amp: 0.45 },
+    idle:    { hz: 0.7, amp: 0.50, bursts: true }, shy: { hz: 0.8, amp: 0.30 },
+    sad:     { hz: 0.0, amp: 0.00, droop: 11 }, angry: { hz: 3.6, amp: 0.10 },
+  },
+  milo: {
+    excited: { hz: 2.6, amp: 1.00 }, talking: { hz: 1.3, amp: 0.50 },
+    idle:    { hz: 0.8, amp: 0.55, bursts: true }, shy: { hz: 0.9, amp: 0.35 },
+    sad:     { hz: 0.0, amp: 0.00, droop: 12 }, angry: { hz: 3.8, amp: 0.12 },
+  },
+};
+const WAG_MAX_DEG = 16;
+/* Dynamic blush — one overlay plate per character; opacity follows the
+   active expression (the dictionary's blush parameter, sprite form). */
+const BLUSH_LEVEL = { shy: 0.95, closed_happy: 0.50, sparkle: 0.45, happy: 0.35,
+                      wink: 0.30, proud: 0.30, smug: 0.20 };
+const EXPRESSIONS = ["neutral", "happy", "closed_happy", "wink", "sparkle", "smug",
+                     "sad", "surprised", "angry", "thinking", "shy", "proud"];
 const CHARACTERS = {
   paige: { label: "Paige", spriteDir: "assets/paige", layerDir: "assets/paige-layers",
            layers: ["hairback", "body", "bust", "face", "hairfront"],
-           pivots: { bust: "50% 78%", hairback: "50% 16%", hairfront: "50% 14%" } },
+           mouth: { 1: "talk_half", 2: "talk" },
+           jaw: { pivot: "50.6% 35.5%", maxDeg: 9 },
+           pivots: { bust: "50% 60%", hairback: "50% 16%", hairfront: "50% 14%" } },
   clem:  { label: "Clementine", spriteDir: "assets/clem", layerDir: "assets/clem-layers",
            layers: ["hairback", "ribbon", "body", "bust", "face", "hairfront"],
-           pivots: { bust: "52% 76%", ribbon: "30% 22%", hairback: "50% 16%", hairfront: "50% 14%" } },
+           mouth: { 1: "talk_half", 2: "talk" },
+           jaw: { pivot: "50.5% 35.6%", maxDeg: 10 },
+           pivots: { bust: "52% 63%", ribbon: "30% 22%", hairback: "50% 16%", hairfront: "50% 14%" } },
 };
 
 /* ---------------- envelope (the pipeline demo's proven RMS approach) ----
@@ -78,6 +138,54 @@ class Spring {
   }
   kick(vx, vy) { this.vx += vx; this.vy += vy; }
 }
+/* 1-DOF rotation spring — the tail-wag follower. The wag driver writes
+   only its TARGET angle; this spring owns the motion (lag + settle). */
+class RotSpring {
+  constructor(omega, zeta) { this.o = omega; this.z = zeta; this.a = 0; this.v = 0; }
+  step(dt, target) {
+    const acc = this.o * this.o * (target - this.a) - 2 * this.z * this.o * this.v;
+    this.v += acc * dt; this.a += this.v * dt;
+  }
+}
+
+/* ---------------- face crossfade stack ----------------
+   Two stacked plates: the bottom always holds the settled face, fully
+   opaque; the top fades a new face in over it, then the bottom adopts
+   it. Opacity advances only inside update(dt) — driven by the engine
+   tick — so a fade takes the same number of STAGE frames live (rAF)
+   and under the deterministic capture clock. A set() mid-fade simply
+   retargets the top plate and keeps fading from the current opacity. */
+class FadeStack {
+  constructor(bottom, top) {
+    this.els = [bottom, top];
+    this.bottom = bottom; this.top = top;
+    this.settled = null; this.target = null;
+    this.o = 0; this.dur = 0.09; this.fading = false;
+    this.top.style.opacity = "0";
+  }
+  set(src, fadeMs) {
+    if (src === this.target) return;
+    this.target = src;
+    if (this.settled === null) {            // first face: settle at once
+      this.bottom.src = src; this.settled = src;
+      this.top.style.opacity = "0"; this.o = 0; this.fading = false;
+      return;
+    }
+    this.top.src = src;
+    this.dur = Math.max(0.02, (fadeMs || 90) / 1000);
+    this.fading = true;                     // continue from current opacity
+  }
+  update(dt) {
+    if (!this.fading) return;
+    this.o = Math.min(1, this.o + dt / this.dur);
+    const p = this.o * this.o * (3 - 2 * this.o);   // smoothstep
+    this.top.style.opacity = p.toFixed(3);
+    if (this.o >= 1) {
+      this.bottom.src = this.target; this.settled = this.target;
+      this.top.style.opacity = "0"; this.o = 0; this.fading = false;
+    }
+  }
+}
 
 /* ---------------- avatar ---------------- */
 class Avatar {
@@ -89,7 +197,18 @@ class Avatar {
     this.env = null;
     this.nextBlink = performance.now() + 2600; this.blinkUntil = 0;
     this.gain = 1.0; this.prevEnv = 0;
+    this.envSmooth = 0; this.bounceSm = 0; this._lastFace = "neutral";
+    this.mouthLevel = 0;                            // graded mouth band 0/1/2
+    this.blushO = 0; this.blushTarget = 0; this.blushEl = null;
+    this.nextMicro = 2500 + Math.random() * 2000;   // micro-impulse scheduler
+    this.wag = null; this._wagEl = null;            // tail wag (driver->target)
+    this.wagSpring = new RotSpring(18, 0.6);
+    this.wagPhase = 0; this.wagHzSm = 0; this.wagAmpSm = 0; this.wagAngle = 0;
+    this.wagGateOn = false; this.wagGateAt = 1200;  // idle burst gating
+    this.jawA = 0; this.jawSpring = new RotSpring(26, 0.55); this.jawEl = null;
+    this.debugJaw = null;                           // verification hook (0..1)
     this.springs = {}; this.layerEls = {}; this.spriteEl = null; this.faceEl = null;
+    this.spriteStack = null; this.faceStack = null;
     this.spriteSpring = new Spring({ omega: 12, zeta: 0.42 });
     this.build();
     this.last = performance.now();
@@ -101,43 +220,145 @@ class Avatar {
     };
     requestAnimationFrame(loop);
   }
+  preloadFaces(C) {
+    // Decode every face/sprite state up front so a crossfade never
+    // waits on a first-use image load mid-performance.
+    const ext = C.ext || "png";
+    const states = new Set([...EXPRESSIONS, "talk", "talk_half", "blink", "neutral"]);
+    for (const s of states) {
+      const a = new Image(); a.src = `${C.spriteDir}/${s}.${ext}`;
+      const b = new Image(); b.src = `${C.layerDir}/faces/${s}.${ext}`;
+    }
+    const bl = new Image(); bl.src = `${C.layerDir}/blush.${ext}`;
+    const jw = new Image(); jw.src = `${C.layerDir}/jaw.${ext}`;
+  }
   build() {
     this.charEl.innerHTML = ""; this.layerEls = {}; this.spriteEl = null; this.faceEl = null;
+    this.spriteStack = null; this.faceStack = null; this.blushEl = null; this.jawEl = null;
+    this.underlayEl = null;
+    this.wag = null; this._wagEl = null;
     const C = CHARACTERS[this.char];
+    this.tuning = {};
+    for (const k of Object.keys(SPRING_TUNING))
+      this.tuning[k] = { ...SPRING_TUNING[k], ...((SPRING_OVERRIDES[this.char] || {})[k] || {}) };
+    this.preloadFaces(C);
     if (this.mode === "sprite") {
-      const img = document.createElement("img");
-      img.className = "base"; img.src = `${C.spriteDir}/neutral.${C.ext || "png"}`; img.alt = C.label;
-      this.charEl.appendChild(img); this.spriteEl = img;
+      const bottom = document.createElement("img");
+      bottom.className = "base"; bottom.alt = C.label;
+      const top = document.createElement("img");
+      top.alt = "";
+      this.charEl.appendChild(bottom); this.charEl.appendChild(top);
+      this.spriteStack = new FadeStack(bottom, top);
+      this.spriteStack.set(`${C.spriteDir}/neutral.${C.ext || "png"}`, 0);
+      this.spriteEl = bottom;
+      this._addBlush(C);
     } else {
+      /* Underlay: a static copy of the whole neutral sprite beneath the
+         layers (locked to the body spring). At rest it is fully covered
+         and changes nothing; when an impulse swings layers apart for a
+         few frames, the gaps show matching art instead of the stage
+         background shining through the figure. */
+      const under = document.createElement("img");
+      under.src = `${C.spriteDir}/neutral.${C.ext || "png"}`;
+      under.alt = ""; under.dataset.layer = "underlay";
+      this.charEl.appendChild(under); this.underlayEl = under;
       for (const name of C.layers) {
+        if (name === "face") {
+          const bottom = document.createElement("img");
+          bottom.alt = ""; bottom.dataset.layer = "face";
+          const top = document.createElement("img");
+          top.alt = ""; top.dataset.layer = "face";
+          this.charEl.appendChild(bottom); this.charEl.appendChild(top);
+          this.faceStack = new FadeStack(bottom, top);
+          this.faceStack.set(`${C.layerDir}/faces/neutral.${C.ext || "png"}`, 0);
+          this.faceEl = bottom;
+          this._addBlush(C);   // blush rides above the face, under front hair
+          if (C.jaw) {         // two-piece mouth: jaw patch above the face
+            const jw = document.createElement("img");
+            jw.src = `${C.layerDir}/jaw.${C.ext || "png"}`;
+            jw.alt = ""; jw.dataset.layer = "jaw";
+            jw.style.transformOrigin = C.jaw.pivot;
+            jw.style.opacity = "0"; jw.style.pointerEvents = "none";
+            this.charEl.appendChild(jw); this.jawEl = jw;
+          }
+          continue;
+        }
         const img = document.createElement("img");
-        if (name === "face") { img.src = `${C.layerDir}/faces/neutral.${C.ext || "png"}`; this.faceEl = img; }
-        else img.src = `${C.layerDir}/${name}.${C.ext || "png"}`;
+        img.src = `${C.layerDir}/${name}.${C.ext || "png"}`;
         img.alt = ""; img.dataset.layer = name;
         if (C.pivots[name]) img.style.transformOrigin = C.pivots[name];
         this.charEl.appendChild(img); this.layerEls[name] = img;
       }
       this.springs = { body: new Spring(SPRING_TUNING.body) };
-      const keyFor = { hairback: "hairBack", hairfront: "hairFront", bust: "bust", ribbon: "ribbon" };
+      const keyFor = { hairback: "hairBack", hairfront: "hairFront", bust: "bust", ribbon: "ribbon", tail: "tail" };
       for (const [elName, key] of Object.entries(keyFor))
         if (this.layerEls[elName]) this.springs[key] = new Spring(SPRING_TUNING[key]);
+      if (C.tail && this.layerEls[C.tail.layer]) this.setWagLayer(C.tail.layer);
     }
     this.applyExpression();
   }
+  _addBlush(C) {
+    const img = document.createElement("img");
+    img.src = `${C.layerDir}/blush.${C.ext || "png"}`;
+    img.alt = ""; img.dataset.layer = "blush";
+    img.style.opacity = "0"; img.style.pointerEvents = "none";
+    this.charEl.appendChild(img); this.blushEl = img;
+  }
+  /* Wag hook: enable the tail-wag driver on a layer (Milo's tail once
+     his set lands; the player's demo toggle points it at Clementine's
+     ribbon as a stand-in). The driver writes the layer's rotation
+     spring TARGET only — physics still owns the motion. */
+  setWagLayer(name) {
+    const keyFor = { hairback: "hairBack", hairfront: "hairFront", bust: "bust", ribbon: "ribbon", tail: "tail" };
+    if (!name || !this.layerEls[name] || !keyFor[name]) { this.wag = null; this._wagEl = null; return; }
+    this.wag = { layer: name, key: keyFor[name] };
+    this._wagEl = this.layerEls[name];
+  }
+  wagClass() {
+    const e = this.expression;
+    if (e === "happy" || e === "proud" || e === "sparkle" || e === "closed_happy" || e === "wink") return "excited";
+    if (e === "shy") return "shy";
+    if (e === "sad") return "sad";
+    if (e === "angry") return "angry";
+    if (this.mouthLevel > 0) return "talking";
+    return "idle";
+  }
+  mouthName(level) {
+    const M = CHARACTERS[this.char].mouth || {};
+    return M[level] || "talk";
+  }
   setChar(c) { this.char = c; this.build(); }
   setMode(m) { this.mode = m; this.build(); }
+  jawActive() {
+    return this.mode === "layered" && !!CHARACTERS[this.char].jaw &&
+      (this.mouthLevel > 0 || this.jawA > 0.03 || (this.debugJaw != null && this.debugJaw > 0));
+  }
   currentFace() {
-    if (this.talking) return "talk";
+    /* Layered mode speaks through the two-piece jaw: the face plate is
+       the open-mouth TALK plate and the jaw patch (cut from neutral)
+       covers it to a continuous aperture. Sprite mode has no layers to
+       split, so it keeps the graded static mouth bands. The phoneme
+       path (Kokoro timestamps for live lines, Rhubarb for canned ones)
+       plugs into the same aperture input later — today it is the RMS
+       envelope, exactly as the bands use it. */
+    if (this.jawActive()) return "talk";
+    if (this.mouthLevel > 0) return this.mouthName(this.mouthLevel);
     if (performance.now() < this.blinkUntil) return "blink";
     return this.expression;
   }
   applyExpression() {
     const C = CHARACTERS[this.char], face = this.currentFace();
-    if (this.mode === "sprite" && this.spriteEl) this.spriteEl.src = `${C.spriteDir}/${face}.${C.ext || "png"}`;
-    if (this.mode === "layered" && this.faceEl) this.faceEl.src = `${C.layerDir}/faces/${face}.${C.ext || "png"}`;
+    // Blinks are quick (45 ms); mouth-band swaps snappy (50 ms);
+    // expression swaps get the full ~90 ms.
+    const isMouth = face.startsWith("talk") || this._lastFace.startsWith("talk");
+    const fade = (face === "blink" || this._lastFace === "blink") ? 45 : isMouth ? 50 : 90;
+    this._lastFace = face;
+    if (this.mode === "sprite" && this.spriteStack) this.spriteStack.set(`${C.spriteDir}/${face}.${C.ext || "png"}`, fade);
+    if (this.mode === "layered" && this.faceStack) this.faceStack.set(`${C.layerDir}/faces/${face}.${C.ext || "png"}`, fade);
   }
   setExpression(name, withImpulse = true) {
     this.expression = name; this.applyExpression();
+    this.blushTarget = BLUSH_LEVEL[name] ?? 0;
     if (withImpulse) this.impulse(0, -46);
     this.log("expression", { name });
   }
@@ -147,7 +368,7 @@ class Avatar {
     if (s.hairBack) s.hairBack.kick(vx * 0.7, vy * 0.7);
     if (s.hairFront) s.hairFront.kick(vx * 0.85, vy * 0.85);
     if (s.ribbon) s.ribbon.kick(vx * 1.5, vy * 1.2);
-    if (s.bust) s.bust.kick(vx * 0.25, vy * 0.4);
+    if (s.bust) s.bust.kick(vx * 0.35, vy * 0.55);
     if (s.body) s.body.kick(vx * 0.3, vy * 0.5);
   }
   async playLine(url) {
@@ -166,42 +387,119 @@ class Avatar {
     return idx < this.env.buckets.length ? this.env.buckets[idx] : 0;
   }
   tick(now, dt) {
-    const env = this.envelopeNow();
-    const wasTalking = this.talking;
-    this.talking = env > TALK_THRESHOLD;
-    if (this.talking !== wasTalking) this.applyExpression();
+    /* Envelope smoothing: one-pole on the raw RMS buckets — fast attack
+       (~15 ms time constant) so speech onsets stay crisp, slow release
+       (~120 ms) so the mouth settles instead of jittering bucket to
+       bucket and `talking` holds through syllable gaps. Everything
+       below (talk state, bounce, impulse trigger) reads the smoothed
+       value; the buckets themselves are unchanged. */
+    const rawEnv = this.envelopeNow();
+    const tcEnv = rawEnv > this.envSmooth ? 0.015 : 0.120;
+    this.envSmooth += (rawEnv - this.envSmooth) * (1 - Math.exp(-dt / tcEnv));
+    const env = this.envSmooth;
+    /* Graded mouth: band the smoothed envelope into openness levels
+       with hysteresis (Rin's lesson from the Kyndred teardown) — a
+       half-open mouth for quiet speech, full-open for loud, instead of
+       a binary flap. Bands: 0 below ~0.16, 1 to ~0.50, 2 above. */
+    const HI = 0.50, LO = 0.16;
+    let ml = this.mouthLevel;
+    if (ml === 0) { if (env > HI) ml = 2; else if (env > LO) ml = 1; }
+    else if (ml === 1) { if (env > HI + 0.05) ml = 2; else if (env < LO - 0.04) ml = 0; }
+    else if (env < LO - 0.04) ml = 0; else if (env < HI - 0.07) ml = 1;
+    if (ml !== this.mouthLevel) { this.mouthLevel = ml; this.applyExpression(); }
+    this.talking = ml > 0;
     if (now > this.nextBlink) { this.blinkUntil = now + 140; this.nextBlink = now + 2200 + Math.random() * 3000; this.applyExpression(); }
     if (this.blinkUntil && now > this.blinkUntil && !this.talking) { this.blinkUntil = 0; this.applyExpression(); }
+    if (this.spriteStack) this.spriteStack.update(dt);
+    if (this.faceStack) this.faceStack.update(dt);
+    if (this.blushEl) {   // dynamic blush: ease toward the expression's level
+      this.blushO += (this.blushTarget - this.blushO) * (1 - Math.exp(-dt / 0.12));
+      if (Math.abs(this.blushTarget - this.blushO) < 0.004) this.blushO = this.blushTarget;
+      this.blushEl.style.opacity = this.blushO.toFixed(3);
+    }
     const t = now / 1000;
     const mx = Math.sin(t * 0.9) * 2.1 * this.gain;
-    const my = (Math.sin(t * 1.55) * 1.15 - env * 13) * this.gain;
+    /* Speech bounce eased through a ~70 ms one-pole on top of the
+       smoothed envelope — continuous in and out, no linear segments. */
+    this.bounceSm += ((-env * 13) - this.bounceSm) * (1 - Math.exp(-dt / 0.07));
+    const my = (Math.sin(t * 1.55) * 1.15 + this.bounceSm) * this.gain;
     if (env > 0.30 && this.prevEnv <= 0.30 && this.mode === "layered") this.impulse(0, -52 * this.gain);
     this.prevEnv = env;
     if (this.mode === "sprite") {
       const s = this.spriteSpring;
       s.step(dt, mx, my);
-      if (this.spriteEl) this.spriteEl.style.transform = `translate(${s.x.toFixed(1)}px, ${s.y.toFixed(1)}px)`;
+      if (this.spriteStack) {
+        const tf = `translate(${s.x.toFixed(1)}px, ${s.y.toFixed(1)}px)`;
+        for (const el of this.spriteStack.els) el.style.transform = tf;
+        if (this.blushEl) this.blushEl.style.transform = tf;
+      }
       return;
     }
     const S = this.springs, body = S.body;
+    /* Micro-impulse scheduler (the blink scheduler's sibling): small
+       randomized spring kicks to hair/ribbon/bust so she idles alive
+       between beats. Half strength while talking. */
+    if (now >= this.nextMicro) {
+      this.nextMicro = now + 1600 + Math.random() * 3200;
+      const ms = (this.talking ? 0.5 : 1.0) * this.gain;
+      if (S.hairBack) S.hairBack.kick((Math.random() - 0.5) * 56 * ms, -(4 + Math.random() * 12) * ms);
+      if (S.hairFront) S.hairFront.kick((Math.random() - 0.5) * 34 * ms, -(3 + Math.random() * 8) * ms);
+      if (S.ribbon) S.ribbon.kick((Math.random() - 0.5) * 78 * ms, -(5 + Math.random() * 14) * ms);
+      if (S.bust) S.bust.kick(0, -(3 + Math.random() * 6) * ms);
+    }
+    /* Tail-wag driver: resolves the emotion class, eases hz/amp, and
+       writes ONLY the wag spring's target angle (one-writer law). */
+    if (this.wag) {
+      const WT = (WAG_TUNING[this.char] || WAG_TUNING.default)[this.wagClass()];
+      let ampT = WT.amp;
+      if (WT.bursts) {
+        if (now >= this.wagGateAt) {
+          this.wagGateOn = !this.wagGateOn;
+          this.wagGateAt = now + (this.wagGateOn ? 2200 + Math.random() * 1600 : 2500 + Math.random() * 3000);
+        }
+        if (!this.wagGateOn) ampT = 0;
+      }
+      this.wagAmpSm += (ampT - this.wagAmpSm) * (1 - Math.exp(-dt / 0.25));
+      this.wagHzSm += (WT.hz - this.wagHzSm) * (1 - Math.exp(-dt / 0.30));
+      this.wagPhase += 2 * Math.PI * this.wagHzSm * dt;
+      this.wagSpring.step(dt, (WT.droop || 0) + Math.sin(this.wagPhase) * this.wagAmpSm * WAG_MAX_DEG);
+      this.wagAngle = this.wagSpring.a;
+    }
     body.step(dt, mx, my);
     const set = (el, spr, tune) => {
       if (!el || !spr) return;
       spr.step(dt, mx * tune.gainX * this.gain, my * tune.gainY * this.gain);
       let x = spr.x, y = spr.y;
       if (tune.clamp) { x = Math.max(-tune.clamp, Math.min(tune.clamp, x)); y = Math.max(-tune.clamp, Math.min(tune.clamp, y)); }
-      const rot = Math.max(-7, Math.min(7, -spr.vx * 0.028 * tune.rot));
+      let rot = Math.max(-7, Math.min(7, -spr.vx * 0.028 * tune.rot));
+      if (this.wag && el === this._wagEl) rot = this.wagAngle;  // wag spring owns this layer's rotation
       el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${rot.toFixed(2)}deg)`;
     };
     const bt = `translate(${body.x.toFixed(1)}px, ${body.y.toFixed(1)}px)`;
+    if (this.underlayEl) this.underlayEl.style.transform = bt;
     if (this.layerEls.body) this.layerEls.body.style.transform = bt;
-    if (this.faceEl) this.faceEl.style.transform = bt; // face locked to the head
-    set(this.layerEls.bust, S.bust, SPRING_TUNING.bust);
-    set(this.layerEls.hairback, S.hairBack, SPRING_TUNING.hairBack);
-    set(this.layerEls.hairfront, S.hairFront, SPRING_TUNING.hairFront);
-    set(this.layerEls.ribbon, S.ribbon, SPRING_TUNING.ribbon);
+    if (this.faceStack) for (const el of this.faceStack.els) el.style.transform = bt; // face locked to the head
+    if (this.blushEl) this.blushEl.style.transform = bt;
+    /* Two-piece jaw: aperture eased from the smoothed envelope, angle
+       through its own spring (lag + a whisper of overshoot). */
+    const CJ = CHARACTERS[this.char];
+    if (this.jawEl && CJ.jaw) {
+      const aT = this.debugJaw != null ? this.debugJaw
+        : this.mouthLevel > 0 ? Math.min(1, env * 1.25) : 0;
+      const prevA = this.jawA;
+      const tcJ = aT > this.jawA ? 0.030 : 0.060;
+      this.jawA += (aT - this.jawA) * (1 - Math.exp(-dt / tcJ));
+      this.jawSpring.step(dt, this.jawA * CJ.jaw.maxDeg);
+      this.jawEl.style.opacity = (this.mouthLevel > 0 || this.jawA > 0.01 || this.debugJaw) ? "1" : "0";
+      this.jawEl.style.transform = bt + ` rotate(${this.jawSpring.a.toFixed(2)}deg) translateY(${(this.jawA * 7).toFixed(1)}px)`;
+      if (this.mouthLevel === 0 && prevA >= 0.03 && this.jawA < 0.03) this.applyExpression();
+    }
+    set(this.layerEls.bust, S.bust, this.tuning.bust);
+    set(this.layerEls.hairback, S.hairBack, this.tuning.hairBack);
+    set(this.layerEls.hairfront, S.hairFront, this.tuning.hairFront);
+    set(this.layerEls.ribbon, S.ribbon, this.tuning.ribbon);
   }
 }
 
-window.PresenceStage = { Avatar, loadEnvelope, SPRING_TUNING, EXPRESSIONS, CHARACTERS, BUCKETS_PER_SEC };
+window.PresenceStage = { Avatar, loadEnvelope, SPRING_TUNING, SPRING_OVERRIDES, WAG_TUNING, BLUSH_LEVEL, EXPRESSIONS, CHARACTERS, BUCKETS_PER_SEC };
 })();

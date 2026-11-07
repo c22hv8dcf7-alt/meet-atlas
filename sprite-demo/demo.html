@@ -44,7 +44,7 @@
     background: linear-gradient(115deg, rgba(255,255,255,.14) 0%, rgba(255,255,255,0) 34%);
   }
   #stage { position: absolute; inset: 0; }
-  #zoom { position: absolute; inset: 0; transform-origin: 50% 88%; }
+  #zoom { position: absolute; inset: 0; transform-origin: 50% 94%; }
   #char { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); }
   #char img { position: absolute; inset: 0; width: 100%; height: 100%; user-select: none; -webkit-user-drag: none; }
   .floorshadow {
@@ -113,7 +113,7 @@
   <span>A scripted taste of Presence. The real thing runs on your own Mac, offline, answering from your full library — this page answers from a handful of fixture lines.</span>
 </div>
 <header>
-  <div class="title"><b>ATLAS PRESENCE</b> — ON YOUR SCREEN</div>
+  <div class="title"><b>ATLAS PRESENCE</b> — MEET PAIGE</div>
   <div id="stateChip"><span class="dot">●</span> <span id="stateText">waking her up…</span></div>
 </header>
 <main>
@@ -187,7 +187,7 @@
     },
     cast: {
       q: "Who else is in the cast?",
-      reply: "Paige leads — she's the first to move in. Then there's Mochi, Vesper, Milo, Clementine, and Juno. " +
+      reply: "Paige leads — she's the first to move in. Then there's Rosalind, Vesper, Milo, Clementine, and Juno. " +
              "Six of us, each with our own card, our own voice, and our own corner of the Room.",
       citations: [], emotion: "happy", audio: "audio/line_cast.wav"
     },
@@ -238,7 +238,10 @@
   function fit() {
     var w = stageEl.clientWidth, h = stageEl.clientHeight;
     if (!w || !h) return;
-    var cs = Math.min(h * 1.02, w * 0.94);
+    // Waist-up art: size her so the figure fills the window height —
+    // the ~3% overflow eats only the canvas's empty headroom above
+    // her hair; her chest stays clear of the caption card below.
+    var cs = Math.min(h * 1.03, w * 0.94);
     charEl.style.width = cs + "px"; charEl.style.height = cs + "px";
   }
   window.addEventListener("resize", fit); fit();
@@ -267,9 +270,11 @@
     replyEl.classList.remove("show");
     questionEl.textContent = "You ask — “" + (typedText || fx.q) + "”";
     questionEl.classList.add("show");
-    zoomTarget = 1.13;
+    zoomTarget = 1.05;
     await sleep(650);
-    avatar.setExpression(EXPRESSION_FOR[fx.emotion] || "neutral", false);
+    // The greeting reads best as closed-happy (^^) — a demo-wiring
+    // special case; the contract emotion text on the chip is unchanged.
+    avatar.setExpression(key === "hello" ? "closed_happy" : (EXPRESSION_FOR[fx.emotion] || "neutral"), false);
     replyEl.textContent = "“" + fx.reply + "”";
     replyEl.classList.add("show");
     if (fx.citations && fx.citations.length) {
@@ -299,7 +304,7 @@
   });
 
   stateText.textContent = "contract atlas-presence/1 · presence: on_screen · ambient: reading · evening";
-  replyEl.textContent = "She's here — that's Paige, our lead. Ask her something — the chips are a good start.";
+  replyEl.textContent = "She's here. Ask her something — the chips are a good start.";
   replyEl.classList.add("show");
   window.__demoReady = true;
 })();
