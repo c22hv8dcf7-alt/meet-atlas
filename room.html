@@ -36,6 +36,13 @@
 .rm-demo-frame{width:100%;height:720px;border:none;border-radius:16px;display:block;margin-top:28px;background:#f7ecda;box-shadow:0 2px 6px rgba(10,17,34,.05),0 16px 36px rgba(10,17,34,.12)}
 .rm-video{width:100%;border-radius:16px;display:block;margin-top:26px;background:#0a1122;box-shadow:0 2px 6px rgba(10,17,34,.05),0 16px 36px rgba(10,17,34,.12)}
 .rm-demo-note{font-size:.9rem;color:var(--muted);margin-top:12px}
+.rm-pipes-title{font-family:var(--serif);font-size:1.55rem;margin-top:42px}
+.rm-pipes{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}
+.rm-pipe{background:linear-gradient(180deg,#fffefb,var(--card) 55%,#faf4e3);border:1px solid var(--line);border-top:4px solid var(--teal);border-bottom:3px solid rgba(233,168,58,.45);border-radius:14px;padding:24px 26px;box-shadow:0 2px 6px rgba(10,17,34,.05),0 16px 36px rgba(10,17,34,.09)}
+.rm-pipe.p2{border-top-color:var(--amber)}
+.rm-pipe h3{font-family:var(--serif);font-size:1.3rem;margin-bottom:8px}
+.rm-pipe p{color:var(--muted);font-size:.99rem}
+@media (max-width:640px){.rm-pipes{grid-template-columns:1fr}}
 @media (max-width:1020px) and (min-width:641px){.rm-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:640px){.rm-grid{grid-template-columns:1fr}.rm-demo-frame{height:880px}}
 </style>
@@ -82,6 +89,19 @@
   <p class="lede">That library is the law. She answers from what's on your shelves, and when the answer isn't there she says so — “That's not in the library.” — instead of inventing one. A companion who lies to be agreeable isn't company.</p>
   <p class="lede">And when a question is genuinely beyond her shelf, she can ask. With your permission, she reaches out to Porch Light's own answer service — one we're building as a pure pass-through: it pulls the answer, hands it back, and keeps nothing. Whatever comes back arrives labeled as borrowed, never passed off as knowledge of her own. And reaching out stays a dial in your hand — how freely she asks is yours to set.</p>
   <p class="lede">And she notices. Movement, stillness, the snack on your desk, the three hours you haven't stood up — she sees them, and because she has a point of view, she says something. When she sees you, it's through your camera, on your machine: the frames are looked at and thrown away — never stored, never sent. The camera that never phones home. And there is no subscription, no coin shop, no server that can be switched off to take her away. When she's yours, she's yours.</p>
+  <h3 class="rm-pipes-title">Two pipelines. <em>One hers — one yours to lend.</em></h3>
+  <div class="rm-pipes">
+    <div class="rm-pipe">
+      <p class="rm-role">Pipeline one · Always on</p>
+      <h3>Hers, on your machine</h3>
+      <p>Her own mind lives on your computer: her brain, her memory of you, her voice, the library she thinks with. It needs no network and waits on no server — pull the Wi-Fi and she is still entirely herself.</p>
+    </div>
+    <div class="rm-pipe p2">
+      <p class="rm-role">Pipeline two · Off until you switch it on</p>
+      <h3>Yours, only when you lend it</h3>
+      <p>The second pipeline stays dark until you turn it on. Then — and only then — she can reach past her own shelf, through an API key of yours or through Porch Light's answer service, and whatever it brings back arrives labeled borrowed, never dressed up as knowledge of her own. Switch it off mid-conversation, for a week, or forever: the switch is in your hand, and it stays where you put it.</p>
+    </div>
+  </div>
 </div></section>
 
 <section><div class="wrap">
