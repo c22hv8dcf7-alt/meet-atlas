@@ -1,230 +1,230 @@
 {
-  "catalog": "Meet Atlas shelf catalog",
-  "version": 1,
-  "generated": "2026-11-07",
-  "release": {
-    "tag": "v1.0.0",
-    "name": "Atlas 1.0.0 for Mac",
-    "page": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/tag/v1.0.0"
+ "catalog": "Meet Atlas shelf catalog",
+ "version": 1,
+ "generated": "2026-11-07",
+ "release": {
+  "tag": "v5.1.0",
+  "name": "Atlas 5.1.0 \u2014 Window-First",
+  "page": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/tag/v5.1.0"
+ },
+ "note": "Every downloadable file on the Meet Atlas shelf: name, exact size, and SHA-256. Built from the live release and regenerated on every shelf change; the Library page, the picker, and the app all read this list.",
+ "asset_count": 29,
+ "assets": [
+  {
+   "name": "CLEMENTINE-MANIFEST.sig",
+   "kind": "presence-pack-manifest",
+   "size_bytes": 64,
+   "sha256": "e589445c5c8a2ff6171b54ce7bc1ad9615f60283937cb3e7dd4ab931bc3c9b43",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/CLEMENTINE-MANIFEST.sig"
   },
-  "note": "Every downloadable file on the Meet Atlas shelf: name, exact size, and SHA-256. Built from the live release and regenerated on every shelf change; the Library page, the picker, and the app all read this list.",
-  "asset_count": 29,
-  "assets": [
-    {
-      "name": "atlas-mac.zip",
-      "kind": "atlas-edition",
-      "size_bytes": 996203,
-      "sha256": "7675c684fa19592eb56fbdebb381389410b56c40968e80efbbe4732eeae678f2",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/atlas-mac.zip",
-      "license": "Atlas Free-Use License"
-    },
-    {
-      "name": "atlas-linux.tar.gz",
-      "kind": "atlas-edition",
-      "size_bytes": 271138,
-      "sha256": "6e9349a151f4141da9ec73668ef52c8188fefc14c1ca7149c6dd3d3bd4e7d663",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/atlas-linux.tar.gz",
-      "license": "Atlas Free-Use License"
-    },
-    {
-      "name": "atlas-chromebook.tar.gz",
-      "kind": "atlas-edition",
-      "size_bytes": 276193,
-      "sha256": "81be64c515e66d10e4c9648cb4b882e81eb5a317c05a505fe994646ed5420483",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/atlas-chromebook.tar.gz",
-      "license": "Atlas Free-Use License"
-    },
-    {
-      "name": "app-classroom.zip",
-      "kind": "companion-app",
-      "size_bytes": 22348,
-      "sha256": "935f2faa7369cbbf159ea03c1641a4d2fb3d75bcd0ac54ad47bacec8cb731fc3",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/app-classroom.zip",
-      "license": "Atlas Free-Use License"
-    },
-    {
-      "name": "app-ledger.zip",
-      "kind": "companion-app",
-      "size_bytes": 22593,
-      "sha256": "4c677c123b959cba90d93ee09ce4a9ee05608736443058fbec27eccde85857db",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/app-ledger.zip",
-      "license": "Atlas Free-Use License"
-    },
-    {
-      "name": "app-darkroom.zip",
-      "kind": "companion-app",
-      "size_bytes": 22467,
-      "sha256": "ccedb0c05ae8fa4f00fbf351331290df50191daf9cf3e054385272516818d747",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/app-darkroom.zip",
-      "license": "Atlas Free-Use License"
-    },
-    {
-      "name": "RELEASE-MANIFEST.txt",
-      "kind": "release-manifest",
-      "size_bytes": 795,
-      "sha256": "ac2aa98a3dded0755840b4ddc4ba24e151d35a9940d42fb08e84e579ea05808f",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/RELEASE-MANIFEST.txt"
-    },
-    {
-      "name": "RELEASE-MANIFEST.sig",
-      "kind": "release-manifest",
-      "size_bytes": 64,
-      "sha256": "66eef33ad982def102c60886db2c51021d3d45452a876493cf03c332e780597f",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/RELEASE-MANIFEST.sig"
-    },
-    {
-      "name": "pack-everyday.zip",
-      "kind": "knowledge-pack",
-      "size_bytes": 98904298,
-      "sha256": "4d02dc7f18d59f1bf0474c9d233973c4a178ad292d2552fd14d85a727899c071",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/pack-everyday.zip",
-      "license": "Pack contents CC BY-SA (Wikipedia / Wikibooks), attributed inside the pack"
-    },
-    {
-      "name": "EVERYDAY-MANIFEST.txt",
-      "kind": "knowledge-pack-manifest",
-      "size_bytes": 745,
-      "sha256": "a8cea7af82ee8ccabe4deea37a11c01f64f76dd3a7e62a60821d126b78962399",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/EVERYDAY-MANIFEST.txt"
-    },
-    {
-      "name": "EVERYDAY-MANIFEST.sig",
-      "kind": "knowledge-pack-manifest",
-      "size_bytes": 64,
-      "sha256": "ed0596a06798ec86bfb5f8bb947547d635d1aa0b098012e4a47372700a0740e7",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/EVERYDAY-MANIFEST.sig"
-    },
-    {
-      "name": "paige-presence-pack.zip",
-      "kind": "presence-character-pack",
-      "size_bytes": 68662216,
-      "sha256": "91b51d4b66df5001fedf30e3a6a4f71de0322b6a0a7997af51e5f23db9edb185",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/paige-presence-pack.zip",
-      "license": "Porch Light character license — see LICENSE inside the pack"
-    },
-    {
-      "name": "PAIGE-MANIFEST.txt",
-      "kind": "presence-pack-manifest",
-      "size_bytes": 823,
-      "sha256": "29f4b98267b6f964e93a8e31cf8f77f87dfe4ec454d3cf7cc5da20b9ad08185b",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/PAIGE-MANIFEST.txt"
-    },
-    {
-      "name": "PAIGE-MANIFEST.sig",
-      "kind": "presence-pack-manifest",
-      "size_bytes": 64,
-      "sha256": "8a0695c8bc49a688ff1605aca7ddf9b115eaea27a5889ce2a61fc19d6f977591",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/PAIGE-MANIFEST.sig"
-    },
-    {
-      "name": "clementine-presence-pack.zip",
-      "kind": "presence-character-pack",
-      "size_bytes": 73178740,
-      "sha256": "1052dc4b2a194a70d506ca2fc93306bd87bae7aeb80c535a77d416bc8c2cf073",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/clementine-presence-pack.zip",
-      "license": "Porch Light character license — see LICENSE inside the pack"
-    },
-    {
-      "name": "CLEMENTINE-MANIFEST.txt",
-      "kind": "presence-pack-manifest",
-      "size_bytes": 833,
-      "sha256": "6bbcdc435d6152253a575c59e7b0b94ac243da0ca8694d3a54e7c0773a38d2e5",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/CLEMENTINE-MANIFEST.txt"
-    },
-    {
-      "name": "CLEMENTINE-MANIFEST.sig",
-      "kind": "presence-pack-manifest",
-      "size_bytes": 64,
-      "sha256": "e589445c5c8a2ff6171b54ce7bc1ad9615f60283937cb3e7dd4ab931bc3c9b43",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/CLEMENTINE-MANIFEST.sig"
-    },
-    {
-      "name": "milo-presence-pack.zip",
-      "kind": "presence-character-pack",
-      "size_bytes": 43461631,
-      "sha256": "7b6f25c3374d9f4bd81f8fa8bf17bee4a071604c9b363472ad796e7014f1829e",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/milo-presence-pack.zip",
-      "license": "Porch Light character license — see LICENSE inside the pack"
-    },
-    {
-      "name": "MILO-MANIFEST.txt",
-      "kind": "presence-pack-manifest",
-      "size_bytes": 821,
-      "sha256": "168ec63a32476c6dc6f4c45d67ae6965014121b446de2e868f4d8ddc8c15f37f",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/MILO-MANIFEST.txt"
-    },
-    {
-      "name": "MILO-MANIFEST.sig",
-      "kind": "presence-pack-manifest",
-      "size_bytes": 64,
-      "sha256": "27fb8bc92f2f4570a13e272be4b66045e13aa8a7f2515ea9803a1e25b2d75082",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/MILO-MANIFEST.sig"
-    },
-    {
-      "name": "vesper-presence-pack.zip",
-      "kind": "presence-character-pack",
-      "size_bytes": 32068775,
-      "sha256": "9b7587ec3c11a867cf2259cf73a2b88da314d576436667244b453088138e66d0",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/vesper-presence-pack.zip",
-      "license": "Porch Light character license — see LICENSE inside the pack"
-    },
-    {
-      "name": "VESPER-MANIFEST.txt",
-      "kind": "presence-pack-manifest",
-      "size_bytes": 825,
-      "sha256": "e1a5f7bb3d4530c92d0a01d4e32811b14c621f7173d836dab964f4a6fd7b48c5",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/VESPER-MANIFEST.txt"
-    },
-    {
-      "name": "VESPER-MANIFEST.sig",
-      "kind": "presence-pack-manifest",
-      "size_bytes": 64,
-      "sha256": "ecc656a940b032a97a587ee8157fefd43e40f52530e8bb6d00699e35d42194fa",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/VESPER-MANIFEST.sig"
-    },
-    {
-      "name": "juno-presence-pack.zip",
-      "kind": "presence-character-pack",
-      "size_bytes": 57726380,
-      "sha256": "a9d132341dfa3d865747ebbfe55877456115009d05c7200650143be93da25d4c",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/juno-presence-pack.zip",
-      "license": "Porch Light character license — see LICENSE inside the pack"
-    },
-    {
-      "name": "JUNO-MANIFEST.txt",
-      "kind": "presence-pack-manifest",
-      "size_bytes": 821,
-      "sha256": "34cabdc8bdb5169f804e5c5262935c6b65d0d032527a557486140fc036dd7a49",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/JUNO-MANIFEST.txt"
-    },
-    {
-      "name": "JUNO-MANIFEST.sig",
-      "kind": "presence-pack-manifest",
-      "size_bytes": 64,
-      "sha256": "2b5ab3e5c12660699f41941f86a7f36e61565ce70090079c897f2ab98e5db84d",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/JUNO-MANIFEST.sig"
-    },
-    {
-      "name": "mochi-presence-pack.zip",
-      "kind": "presence-character-pack",
-      "size_bytes": 55901584,
-      "sha256": "1bb2835b8a1cb1430508e328c3a061b17d9aa2c20ff72842ab749982bc70f275",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/mochi-presence-pack.zip",
-      "license": "Porch Light character license — see LICENSE inside the pack"
-    },
-    {
-      "name": "MOCHI-MANIFEST.txt",
-      "kind": "presence-pack-manifest",
-      "size_bytes": 823,
-      "sha256": "0034f27dc67db1168899bc5935e00ac86443d4c30b45ae91f905be5938d54c20",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/MOCHI-MANIFEST.txt"
-    },
-    {
-      "name": "MOCHI-MANIFEST.sig",
-      "kind": "presence-pack-manifest",
-      "size_bytes": 64,
-      "sha256": "0825cc109185099d5058d32075155134e555ca8412007a756d8af53ea46a1b92",
-      "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/MOCHI-MANIFEST.sig"
-    }
-  ]
+  {
+   "name": "CLEMENTINE-MANIFEST.txt",
+   "kind": "presence-pack-manifest",
+   "size_bytes": 833,
+   "sha256": "6bbcdc435d6152253a575c59e7b0b94ac243da0ca8694d3a54e7c0773a38d2e5",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/CLEMENTINE-MANIFEST.txt"
+  },
+  {
+   "name": "EVERYDAY-MANIFEST.sig",
+   "kind": "knowledge-pack-manifest",
+   "size_bytes": 64,
+   "sha256": "ed0596a06798ec86bfb5f8bb947547d635d1aa0b098012e4a47372700a0740e7",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/EVERYDAY-MANIFEST.sig"
+  },
+  {
+   "name": "EVERYDAY-MANIFEST.txt",
+   "kind": "knowledge-pack-manifest",
+   "size_bytes": 745,
+   "sha256": "a8cea7af82ee8ccabe4deea37a11c01f64f76dd3a7e62a60821d126b78962399",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/EVERYDAY-MANIFEST.txt"
+  },
+  {
+   "name": "JUNO-MANIFEST.sig",
+   "kind": "presence-pack-manifest",
+   "size_bytes": 64,
+   "sha256": "2b5ab3e5c12660699f41941f86a7f36e61565ce70090079c897f2ab98e5db84d",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/JUNO-MANIFEST.sig"
+  },
+  {
+   "name": "JUNO-MANIFEST.txt",
+   "kind": "presence-pack-manifest",
+   "size_bytes": 821,
+   "sha256": "34cabdc8bdb5169f804e5c5262935c6b65d0d032527a557486140fc036dd7a49",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/JUNO-MANIFEST.txt"
+  },
+  {
+   "name": "MILO-MANIFEST.sig",
+   "kind": "presence-pack-manifest",
+   "size_bytes": 64,
+   "sha256": "27fb8bc92f2f4570a13e272be4b66045e13aa8a7f2515ea9803a1e25b2d75082",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/MILO-MANIFEST.sig"
+  },
+  {
+   "name": "MILO-MANIFEST.txt",
+   "kind": "presence-pack-manifest",
+   "size_bytes": 821,
+   "sha256": "168ec63a32476c6dc6f4c45d67ae6965014121b446de2e868f4d8ddc8c15f37f",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/MILO-MANIFEST.txt"
+  },
+  {
+   "name": "MOCHI-MANIFEST.sig",
+   "kind": "presence-pack-manifest",
+   "size_bytes": 64,
+   "sha256": "0825cc109185099d5058d32075155134e555ca8412007a756d8af53ea46a1b92",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/MOCHI-MANIFEST.sig"
+  },
+  {
+   "name": "MOCHI-MANIFEST.txt",
+   "kind": "presence-pack-manifest",
+   "size_bytes": 823,
+   "sha256": "0034f27dc67db1168899bc5935e00ac86443d4c30b45ae91f905be5938d54c20",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/MOCHI-MANIFEST.txt"
+  },
+  {
+   "name": "PAIGE-MANIFEST.sig",
+   "kind": "presence-pack-manifest",
+   "size_bytes": 64,
+   "sha256": "8a0695c8bc49a688ff1605aca7ddf9b115eaea27a5889ce2a61fc19d6f977591",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/PAIGE-MANIFEST.sig"
+  },
+  {
+   "name": "PAIGE-MANIFEST.txt",
+   "kind": "presence-pack-manifest",
+   "size_bytes": 823,
+   "sha256": "29f4b98267b6f964e93a8e31cf8f77f87dfe4ec454d3cf7cc5da20b9ad08185b",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/PAIGE-MANIFEST.txt"
+  },
+  {
+   "name": "RELEASE-MANIFEST.sig",
+   "kind": "release-manifest",
+   "size_bytes": 64,
+   "sha256": "66eef33ad982def102c60886db2c51021d3d45452a876493cf03c332e780597f",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/RELEASE-MANIFEST.sig"
+  },
+  {
+   "name": "RELEASE-MANIFEST.txt",
+   "kind": "release-manifest",
+   "size_bytes": 795,
+   "sha256": "ac2aa98a3dded0755840b4ddc4ba24e151d35a9940d42fb08e84e579ea05808f",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/RELEASE-MANIFEST.txt"
+  },
+  {
+   "name": "VESPER-MANIFEST.sig",
+   "kind": "presence-pack-manifest",
+   "size_bytes": 64,
+   "sha256": "ecc656a940b032a97a587ee8157fefd43e40f52530e8bb6d00699e35d42194fa",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/VESPER-MANIFEST.sig"
+  },
+  {
+   "name": "VESPER-MANIFEST.txt",
+   "kind": "presence-pack-manifest",
+   "size_bytes": 825,
+   "sha256": "e1a5f7bb3d4530c92d0a01d4e32811b14c621f7173d836dab964f4a6fd7b48c5",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/VESPER-MANIFEST.txt"
+  },
+  {
+   "name": "app-classroom.zip",
+   "kind": "companion-app",
+   "size_bytes": 22348,
+   "sha256": "935f2faa7369cbbf159ea03c1641a4d2fb3d75bcd0ac54ad47bacec8cb731fc3",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/app-classroom.zip",
+   "license": "Atlas Free-Use License"
+  },
+  {
+   "name": "app-darkroom.zip",
+   "kind": "companion-app",
+   "size_bytes": 22467,
+   "sha256": "ccedb0c05ae8fa4f00fbf351331290df50191daf9cf3e054385272516818d747",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/app-darkroom.zip",
+   "license": "Atlas Free-Use License"
+  },
+  {
+   "name": "app-ledger.zip",
+   "kind": "companion-app",
+   "size_bytes": 22593,
+   "sha256": "4c677c123b959cba90d93ee09ce4a9ee05608736443058fbec27eccde85857db",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/app-ledger.zip",
+   "license": "Atlas Free-Use License"
+  },
+  {
+   "name": "atlas-chromebook.tar.gz",
+   "kind": "atlas-edition",
+   "size_bytes": 1164730,
+   "sha256": "511fd2b69a5a0281275e4ba8214ef2afde4a5666b2ba79f49fc413a44cf3ac44",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/atlas-chromebook.tar.gz",
+   "license": "Atlas Free-Use License"
+  },
+  {
+   "name": "atlas-linux.tar.gz",
+   "kind": "atlas-edition",
+   "size_bytes": 1160797,
+   "sha256": "5d4af33c6d8062caecf5b1bd3b78c8bf261e7e1466b31411bde28efdc1d2bf83",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/atlas-linux.tar.gz",
+   "license": "Atlas Free-Use License"
+  },
+  {
+   "name": "atlas-mac.zip",
+   "kind": "atlas-edition",
+   "size_bytes": 1031371,
+   "sha256": "4789aa87f5ffea8d6273b3009782014c1599c0692a3104684ff1aa3e5ced5228",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/atlas-mac.zip",
+   "license": "Atlas Free-Use License"
+  },
+  {
+   "name": "clementine-presence-pack.zip",
+   "kind": "presence-character-pack",
+   "size_bytes": 73178740,
+   "sha256": "1052dc4b2a194a70d506ca2fc93306bd87bae7aeb80c535a77d416bc8c2cf073",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/clementine-presence-pack.zip",
+   "license": "Porch Light character license \u2014 see LICENSE inside the pack"
+  },
+  {
+   "name": "juno-presence-pack.zip",
+   "kind": "presence-character-pack",
+   "size_bytes": 57726380,
+   "sha256": "a9d132341dfa3d865747ebbfe55877456115009d05c7200650143be93da25d4c",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/juno-presence-pack.zip",
+   "license": "Porch Light character license \u2014 see LICENSE inside the pack"
+  },
+  {
+   "name": "milo-presence-pack.zip",
+   "kind": "presence-character-pack",
+   "size_bytes": 43461631,
+   "sha256": "7b6f25c3374d9f4bd81f8fa8bf17bee4a071604c9b363472ad796e7014f1829e",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/milo-presence-pack.zip",
+   "license": "Porch Light character license \u2014 see LICENSE inside the pack"
+  },
+  {
+   "name": "mochi-presence-pack.zip",
+   "kind": "presence-character-pack",
+   "size_bytes": 55901584,
+   "sha256": "1bb2835b8a1cb1430508e328c3a061b17d9aa2c20ff72842ab749982bc70f275",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/mochi-presence-pack.zip",
+   "license": "Porch Light character license \u2014 see LICENSE inside the pack"
+  },
+  {
+   "name": "pack-everyday.zip",
+   "kind": "knowledge-pack",
+   "size_bytes": 98904298,
+   "sha256": "4d02dc7f18d59f1bf0474c9d233973c4a178ad292d2552fd14d85a727899c071",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/pack-everyday.zip",
+   "license": "Pack contents CC BY-SA (Wikipedia / Wikibooks), attributed inside the pack"
+  },
+  {
+   "name": "paige-presence-pack.zip",
+   "kind": "presence-character-pack",
+   "size_bytes": 68662216,
+   "sha256": "91b51d4b66df5001fedf30e3a6a4f71de0322b6a0a7997af51e5f23db9edb185",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/paige-presence-pack.zip",
+   "license": "Porch Light character license \u2014 see LICENSE inside the pack"
+  },
+  {
+   "name": "vesper-presence-pack.zip",
+   "kind": "presence-character-pack",
+   "size_bytes": 32068775,
+   "sha256": "9b7587ec3c11a867cf2259cf73a2b88da314d576436667244b453088138e66d0",
+   "download_url": "https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/vesper-presence-pack.zip",
+   "license": "Porch Light character license \u2014 see LICENSE inside the pack"
+  }
+ ]
 }
