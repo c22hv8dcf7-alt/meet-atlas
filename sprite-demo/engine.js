@@ -98,6 +98,60 @@ const WAG_TUNING = {
   },
 };
 const WAG_MAX_DEG = 16;
+/* ---------------- chain physics (the merge) ----------------
+   chain.js (loaded before this file by the host page) ports PNGTuber
+   Remix's segmented-chain model; INTEGRATION.md in chain-proof/ is
+   the merge recipe this section follows. Layers declared in a
+   character's `chains` table are runtime-sliced into horizontal bands
+   and posed by chains instead of riding a rigid spring plate: hair
+   falls, veils, ponytails and the puppy boys' tails BEND. The wag
+   driver retargets onto the tail chains — wag is a traveling bend,
+   sad is an uncurl-and-hang (chain-proof measured 276 native px of
+   tip travel for the droop, vs the rigid plate's 16 degrees).
+   If chain.js failed to load, every chained layer falls back to its
+   rigid plate — stability first, the stage never breaks. */
+/* Impulse -> chain kick calibration (chain-proof): engine impulse
+   -300 (the shake) <-> chain kick -0.85; the hop (0,-190) <-> +0.35. */
+const CHAIN_KICK = { x: 0.0028, y: -0.00184 };
+/* WAG_TUNING -> chain wag classes (INTEGRATION merge point 5: one
+   table, engine-owned). Chain amp is curvature oscillation as a
+   fraction of CHAIN_TUNING.tail.wag.maxCurvature; WAG_TUNING amp is
+   normalized to Milo's excited +/-28 deg row (1.75), and the chain
+   proof's proven excited response sits at chain amp 1.0 — hence the
+   1/1.75 scale. Droop passes through in degrees (the chain adds its
+   per-joint uncurl bias on top). Idle burst windows convert from
+   WAG_TUNING's [base, span] ms gates to the chain's {cycle, on}. */
+const CHAIN_WAG_AMP = 1 / 1.75;
+function chainWagClasses(charKey, droopScale) {
+  const row = WAG_TUNING[charKey] || WAG_TUNING.default;
+  const out = {};
+  for (const k of Object.keys(row)) {
+    const v = row[k], c = { hz: v.hz, amp: v.amp * CHAIN_WAG_AMP };
+    if (v.droop) c.droop = v.droop * (droopScale == null ? 1 : droopScale);
+    if (v.bursts) {
+      const onW = v.burstOn || [2200, 1600], offW = v.burstOff || [2500, 3000];
+      const on = (onW[0] + onW[1] / 2) / 1000, off = (offW[0] + offW[1] / 2) / 1000;
+      c.bursts = true; c.burst = { cycle: on + off, on };
+    }
+    out[k] = c;
+  }
+  return out;
+}
+/* Bands for a chain, derived from its captured rest FK exactly as the
+   chain proof built them by hand: each segment's band spans its two
+   joints' heights; the outermost bands pad to the art's extremes. */
+function chainBands(chain, geom) {
+  const bands = [];
+  for (let s = 1; s <= chain.n; s++) {
+    const ya = chain.restPos[s - 1].y, yb = chain.restPos[s].y;
+    bands.push({ y0: Math.min(ya, yb), y1: Math.max(ya, yb), seg: s, joint: s - 1 });
+  }
+  let top = bands[0], bot = bands[0];
+  for (const b of bands) { if (b.y0 < top.y0) top = b; if (b.y1 > bot.y1) bot = b; }
+  if (geom.bandTop != null) top.y0 = Math.min(top.y0, geom.bandTop);
+  if (geom.bandBottom != null) bot.y1 = Math.max(bot.y1, geom.bandBottom);
+  return bands;
+}
 /* Dynamic blush — one overlay plate per character; opacity follows the
    active expression (the dictionary's blush parameter, sprite form). */
 const BLUSH_LEVEL = { shy: 0.95, closed_happy: 0.50, sparkle: 0.45, happy: 0.35,
@@ -109,12 +163,33 @@ const CHARACTERS = {
            layers: ["hairback", "body", "bust", "face", "hairfront"],
            mouth: { 1: "talk_half", 2: "talk" },
            jaw: { pivot: "50.6% 35.5%", maxDeg: 9 },
-           pivots: { bust: "50% 60%", hairback: "50% 16%", hairfront: "50% 14%" } },
+           pivots: { bust: "50% 60%", hairback: "50% 16%", hairfront: "50% 14%" },
+           /* Chain geometry — the chain-proof page's proven numbers,
+              verbatim (its bandBottom pads to the full art here). */
+           chains: {
+             hairback: [
+               { tune: "hairBack", strip: [150, 668], anchor: [430, 120], dir: 90, segLen: 196, bandTop: 100, bandBottom: 1600 },
+               { tune: "hairBack", strip: [790, 670], anchor: [1135, 120], dir: 90, segLen: 196, bandTop: 100, bandBottom: 1600 } ],
+             hairfront: [
+               { tune: "hairFront", strip: [470, 695], anchor: [815, 425], dir: 90, segLen: 131, bandTop: 415, bandBottom: 952, overlap: 30 } ] } },
   clem:  { label: "Clementine", spriteDir: "assets/clem", layerDir: "assets/clem-layers",
            layers: ["hairback", "ribbon", "body", "bust", "face", "hairfront"],
            mouth: { 1: "talk_half", 2: "talk" },
            jaw: { pivot: "50.5% 35.6%", maxDeg: 10 },
-           pivots: { bust: "52% 63%", ribbon: "30% 22%", hairback: "50% 16%", hairfront: "50% 14%" } },
+           pivots: { bust: "52% 63%", ribbon: "30% 22%", hairback: "50% 16%", hairfront: "50% 14%" },
+           /* Fitted from her art: two wide slabs tile the back hair
+              (the falls separate below y~500 inside them); the ribbon
+              is a 3-segment fall from its knot at (520,200), spine
+              measured off its alpha centroids (~105 deg throughout). */
+           chains: {
+             hairback: [
+               { tune: "hairBack", strip: [120, 640], anchor: [390, 100], dir: 90, segLen: 154, bandTop: 80, bandBottom: 1180 },
+               { tune: "hairBack", strip: [720, 700], anchor: [1210, 100], dir: 90, segLen: 154, bandTop: 80, bandBottom: 1180 } ],
+             ribbon: [
+               { tune: "hairFront", tuneMods: { segments: 3, stiffness: 16, damping: 4.5, maxAngle: 0.7, curvaturePerJoint: [0, -0.017, 0.087] },
+                 strip: [140, 480], anchor: [520, 200], dir: 105, segLen: 280, restRot: [105, 104, 109], preRoll: 90, bandTop: 175, bandBottom: 1095, kickGain: 2.5 } ],
+             hairfront: [
+               { tune: "hairFront", strip: [320, 960], anchor: [800, 320], dir: 90, segLen: 100, bandTop: 295, bandBottom: 712 } ] } },
   /* The cast-production four (cast-tuning.md is the record). Their
      state files drop the underscores (closedhappy / talkhalf) and
      their smug is the half-lid plate (halflid) — stateMap translates
@@ -134,7 +209,18 @@ const CHARACTERS = {
            pivots: { hairback: "50% 8%", hairfront: "50% 10%", tail: "74.9% 85.7%" },
            layerSprings: { hairback: { gainX: 1.40, gainY: 1.25 },
                            tail: { omega: 9.5, zeta: 0.42, gainX: 1.60, gainY: 1.20, rot: 1.40 } },
-           tail: { layer: "tail" } },
+           tail: { layer: "tail" },
+           /* Tail: the chain-proof fit verbatim (anchor, rest curl,
+              pre-roll). Hair: two wide slabs tile the back hair; the
+              ears ride the stiff root bands. Front: one center chain. */
+           chains: {
+             hairback: [
+               { tune: "hairBack", strip: [200, 620], anchor: [480, 60], dir: 90, segLen: 216, bandTop: 10, bandBottom: 1580 },
+               { tune: "hairBack", strip: [800, 590], anchor: [1070, 60], dir: 90, segLen: 216, bandTop: 10, bandBottom: 1580 } ],
+             hairfront: [
+               { tune: "hairFront", strip: [490, 580], anchor: [770, 290], dir: 90, segLen: 75, bandTop: 270, bandBottom: 570 } ],
+             tail: [
+               { tune: "tail", strip: [1180, 340], anchor: [1225, 1475], dir: -64, segLen: 148, restRot: [-67, -68, -100, -131], preRoll: 120, bandTop: 905, bandBottom: 1525, wag: true, droopScale: 0.75 } ] } },
   juno:  { label: "Juno", spriteDir: "assets/juno", layerDir: "assets/juno-layers",
            layers: ["hairback", "ponytail", "body", "bust", "whistle", "face", "hairfront"],
            mouth: { 1: "talk_half", 2: "talk" },
@@ -144,7 +230,22 @@ const CHARACTERS = {
                      whistle: "48.1% 43.1%", bust: "50% 60%" },
            layerSprings: { ponytail: { omega: 8.5, zeta: 0.38, gainX: 1.70, gainY: 1.30, rot: 1.50 },
                            whistle: { omega: 8.0, zeta: 0.45, gainX: 0.80, gainY: 0.90, rot: 1.20 },
-                           bust: { gainX: 0.30, gainY: 0.45, clamp: 5 } } },
+                           bust: { gainX: 0.30, gainY: 0.45, clamp: 5 } },
+           /* Ponytail fitted off cast-tuning's measured flow points
+              (uniform 128 px segments land within ~25 px of every
+              point); looser than hairFront — hers is the bounciest
+              spring in the cast, so her chain is the loosest too.
+              Hairback: two wide slabs; her falls peek at the right
+              mid-height and the bottom-left inside them. */
+           chains: {
+             hairback: [
+               { tune: "hairBack", strip: [260, 560], anchor: [520, 100], dir: 90, segLen: 214, bandTop: 78, bandBottom: 1600 },
+               { tune: "hairBack", strip: [800, 460], anchor: [1010, 100], dir: 90, segLen: 214, bandTop: 78, bandBottom: 1600 } ],
+             ponytail: [
+               { tune: "hairFront", tuneMods: { stiffness: 13, damping: 4.2, maxAngle: 0.7, comebackSpeed: 0.5, curvaturePerJoint: [0, -0.155, 0.278, 0.141] },
+                 strip: [830, 400], anchor: [944, 176], dir: 68.1, segLen: 128, restRot: [68.1, 59.2, 75.1, 83.2], preRoll: 90, bandTop: 80, bandBottom: 665, kickGain: 1.5 } ],
+             hairfront: [
+               { tune: "hairFront", strip: [480, 630], anchor: [790, 300], dir: 90, segLen: 90, bandTop: 285, bandBottom: 648 } ] } },
   vesper:{ label: "Vesper", spriteDir: "assets/vesper", layerDir: "assets/vesper-layers",
            layers: ["veil_a", "veil_b", "body", "bust", "choker", "face", "hairfront"],
            mouth: { 1: "talk_half", 2: "talk" },
@@ -155,9 +256,21 @@ const CHARACTERS = {
            layerSprings: { veil_a: { omega: 9.5, zeta: 0.42, gainX: 1.20, gainY: 1.10, rot: 0.30 },
                            veil_b: { omega: 8.0, zeta: 0.38, gainX: 1.80, gainY: 1.50, rot: 0.70 },
                            choker: { omega: 11.0, zeta: 0.55, gainX: 0.15, gainY: 0.15, rot: 0.05 },
-                           bust: { omega: 9.0, zeta: 0.48, gainX: 0.28, gainY: 0.40, clamp: 5 } } },
+                           bust: { omega: 9.0, zeta: 0.48, gainX: 0.28, gainY: 0.40, clamp: 5 } },
+           /* The veil's bottom flare (veil_b) is the longest appendage
+              in the cast — two falls, left and right, chained as two
+              soft 5-segment veils. veil_a stays a rigid plate BY
+              DESIGN: it is a 375 px cap hugging the skull (cast-
+              tuning already runs it near-rigid, rot 0.30); bending a
+              skull cap reads as the head deforming, not hair moving. */
+           chains: {
+             veil_b: [
+               { tune: "veil", tuneMods: { segments: 5, stiffness: 9 }, strip: [270, 480], anchor: [500, 1090], dir: 90, segLen: 110, bandTop: 1060, bandBottom: 1600 },
+               { tune: "veil", tuneMods: { segments: 5, stiffness: 9 }, strip: [730, 570], anchor: [1150, 1090], dir: 90, segLen: 110, bandTop: 1060, bandBottom: 1600 } ],
+             hairfront: [
+               { tune: "hairFront", strip: [550, 520], anchor: [800, 290], dir: 90, segLen: 90, bandTop: 260, bandBottom: 628 } ] } },
   mochi: { label: "Mochi", spriteDir: "assets/mochi", layerDir: "assets/mochi-layers",
-           aspect: 1344 / 1728,
+           aspect: 1344 / 1728, canvas: [1344, 1728],
            layers: ["hairback", "tail", "body", "tag", "face", "hairfront"],
            mouth: { 1: "talk_half", 2: "talk" },
            stateMap: { closed_happy: "closedhappy", talk_half: "talkhalf", smug: "halflid" },
@@ -166,7 +279,20 @@ const CHARACTERS = {
            layerSprings: { hairback: { gainX: 1.30, gainY: 1.15 },
                            tail: { omega: 9.5, zeta: 0.42, gainX: 1.60, gainY: 1.20, rot: 1.40 },
                            tag: { omega: 10.0, zeta: 0.50, gainX: 0.25, gainY: 0.30, rot: 0.30 } },
-           tail: { layer: "tail" } },
+           tail: { layer: "tail" },
+           /* Tail fitted off cast-tuning's measured flow points: the
+              plume rises from (1005,1355) and curls over to its tip at
+              (1074,566); per-joint curl replaces Milo's in the tail
+              tune, and his wag table (lazier) is injected the same
+              way. His hairback stays RIGID by design: it is a short
+              earred cap (nothing below y~430) — there is no fall to
+              bend, and ears must never flex. */
+           chains: {
+             hairfront: [
+               { tune: "hairFront", strip: [380, 580], anchor: [660, 250], dir: 90, segLen: 90, bandTop: 230, bandBottom: 598 } ],
+             tail: [
+               { tune: "tail", tuneMods: { curvaturePerJoint: [0, -0.780, -0.175, 0.703] },
+                 strip: [900, 420], anchor: [1005, 1355], dir: -51.6, segLen: 214, restRot: [-51.6, -96.3, -106.3, -66], preRoll: 120, bandTop: 445, bandBottom: 1475, wag: true, droopScale: 0.5 } ] } },
 };
 /* Engine state name -> the character's actual file basename. Most
    sets use the engine names verbatim; the cast-production four
@@ -283,6 +409,7 @@ class Avatar {
     this.debugJaw = null;                           // verification hook (0..1)
     this.springs = {}; this.layerEls = {}; this.spriteEl = null; this.faceEl = null;
     this.spriteStack = null; this.faceStack = null;
+    this.chains = []; this._pendingChains = []; this._chainsPending = 0; this._buildSeq = 0;
     this.spriteSpring = new Spring({ omega: 12, zeta: 0.42 });
     this.build();
     this.last = performance.now();
@@ -312,6 +439,8 @@ class Avatar {
     this.spriteStack = null; this.faceStack = null; this.blushEl = null; this.jawEl = null;
     this.underlayEl = null;
     this.wag = null; this._wagEl = null; this._springLayers = [];
+    this.chains = []; this._pendingChains = []; this._chainsPending = 0;
+    const buildSeq = ++this._buildSeq;
     const C = CHARACTERS[this.char];
     this.tuning = {};
     for (const k of Object.keys(SPRING_TUNING))
@@ -358,12 +487,25 @@ class Avatar {
           }
           continue;
         }
+        if (C.chains && C.chains[name] && window.PresenceChain) {
+          /* Chain layer (INTEGRATION merge point 2): a wrap div takes
+             the layer's z-position; the plate <img> is never created
+             and no Spring is made for it. ChainView stacks are built
+             into the wrap once the layer image has loaded (below). */
+          const wrap = document.createElement("div");
+          wrap.className = "chainWrap"; wrap.dataset.layer = name;
+          wrap.style.cssText = "position:absolute;inset:0;pointer-events:none;";
+          this.charEl.appendChild(wrap);
+          this._pendingChains.push({ name, wrap, geoms: C.chains[name] });
+          continue;
+        }
         const img = document.createElement("img");
         img.src = `${C.layerDir}/${name}.${C.ext || "png"}`;
         img.alt = ""; img.dataset.layer = name;
         if (C.pivots[name]) img.style.transformOrigin = C.pivots[name];
         this.charEl.appendChild(img); this.layerEls[name] = img;
       }
+      for (const p of this._pendingChains) this._loadChains(p, C, buildSeq);
       this.springs = { body: new Spring(SPRING_TUNING.body) };
       /* Every non-face layer rides its own spring toward the shared
          performance target. Standard layer names start from the
@@ -387,6 +529,55 @@ class Avatar {
       if (C.tail && this.layerEls[C.tail.layer]) this.setWagLayer(C.tail.layer);
     }
     this.applyExpression();
+  }
+  /* Build the Chain + ChainView stacks for one chained layer once its
+     image arrives. Curled appendages (tails, the ponytail, Clem's
+     ribbon) seed from their fitted restPose, pre-roll under the
+     deterministic 1/60 clock so the curl settles, then captureRest —
+     at the captured rest pose every band transform is identity, so
+     the stack reproduces the source layer pixel-for-pixel. */
+  _loadChains(p, C, buildSeq) {
+    const PC = window.PresenceChain, D2R = Math.PI / 180;
+    this._chainsPending++;
+    const img = new Image();
+    img.onload = () => {
+      if (buildSeq !== this._buildSeq) return;
+      this._chainsPending--;
+      const cvs = C.canvas || [1600, 1600];
+      for (const geom of p.geoms) {
+        const tune = { ...PC.CHAIN_TUNING[geom.tune], ...(geom.tuneMods || {}) };
+        if (geom.wag) tune.wag = { ...(tune.wag || {}), classes: chainWagClasses(this.char, geom.droopScale) };
+        const chain = new PC.Chain(tune, {
+          anchor: { x: geom.anchor[0], y: geom.anchor[1] },
+          dirAngle: geom.dir * D2R, segmentLength: geom.segLen,
+          restPose: geom.restRot ? { rot: [0, ...geom.restRot.map((d) => d * D2R)] } : undefined,
+        });
+        if (geom.preRoll) { for (let i = 0; i < geom.preRoll; i++) chain.step(1 / 60); chain.captureRest(); }
+        const view = new PC.ChainView(p.wrap, img, {
+          canvas: cvs[0], canvasH: cvs[1],
+          strip: { x: geom.strip[0], w: geom.strip[1] },
+          bands: chainBands(chain, geom), overlap: geom.overlap == null ? 22 : geom.overlap,
+        });
+        this.chains.push({ name: p.name, geom, chain, view, stepper: PC.makeStepper(chain),
+                           restAnchor: { x: geom.anchor[0], y: geom.anchor[1] } });
+      }
+    };
+    img.onerror = () => { if (buildSeq === this._buildSeq) this._chainsPending--; };
+    img.src = `${C.layerDir}/${p.name}.${C.ext || "png"}`;
+  }
+  get chainsReady() { return this._chainsPending === 0; }
+  /* Verification hook: per-chain tip offset (native px from rest) and
+     bend readouts, the chain-proof state() shape. */
+  debugChains() {
+    const D2R = Math.PI / 180;
+    return this.chains.map((rec) => {
+      const c = rec.chain, tip = c.tipOffset();
+      let total = 0;
+      for (let i = 2; i <= c.n; i++) total += Math.abs((c.rot[i] - c.rot[i - 1]) - (c.restRot[i] - c.restRot[i - 1]));
+      return { layer: rec.name, tip: { x: +tip.x.toFixed(1), y: +tip.y.toFixed(1) },
+               bendDeg: +(Math.abs(c.bendAngle()) / D2R).toFixed(2),
+               totalBendDeg: +(total / D2R).toFixed(2) };
+    });
   }
   _addBlush(C) {
     const img = document.createElement("img");
@@ -465,6 +656,13 @@ class Avatar {
     if (s.veil_a) s.veil_a.kick(vx * 0.7, vy * 0.7);
     if (s.veil_b) s.veil_b.kick(vx * 1.2, vy * 1.0);
     if (s.tail) s.tail.kick(vx * 0.3, vy * 0.3);
+    /* Chains (INTEGRATION merge point 4): the same impulse lands as
+       tip-weighted angular momentum, calibrated against the proof.
+       Speech onsets and expression pops flow through here too, so
+       chained hair answers her voice exactly like the springs do. */
+    const kv = vx * CHAIN_KICK.x + vy * CHAIN_KICK.y;
+    if (kv) for (const rec of this.chains)
+      rec.chain.kick(kv * (rec.geom.kickGain == null ? (rec.geom.wag ? 0.5 : 1) : rec.geom.kickGain));
   }
   async playLine(url) {
     const env = await loadEnvelope(url);
@@ -543,6 +741,12 @@ class Avatar {
       if (S.bust) S.bust.kick(0, -(3 + Math.random() * 6) * ms);
       if (S.ponytail) S.ponytail.kick((Math.random() - 0.5) * 60 * ms, -(4 + Math.random() * 12) * ms);
       if (S.veil_b) S.veil_b.kick((Math.random() - 0.5) * 64 * ms, -(4 + Math.random() * 10) * ms);
+      /* Micro-kicks reach chained hair at low gain (INTEGRATION point
+         6); tails are excluded — the wag driver owns their targets. */
+      for (const rec of this.chains) {
+        if (rec.geom.wag) continue;
+        rec.chain.kick((Math.random() - 0.5) * 56 * ms * CHAIN_KICK.x * 0.8);
+      }
     }
     /* Tail-wag driver: resolves the emotion class, eases hz/amp, and
        writes ONLY the wag spring's target angle (one-writer law). */
@@ -593,6 +797,26 @@ class Avatar {
       if (this.mouthLevel === 0 && prevA >= 0.03 && this.jawA < 0.03) this.applyExpression();
     }
     for (const L of this._springLayers) set(L.el, L.spr, L.tune);
+    /* Chains (INTEGRATION merge point 3): each chain's anchor follows
+       the body spring's displacement (read from the spring, never the
+       DOM), converted from display px to native px; the fixed-step
+       stepper quantizes to 1/60 s regardless of caller dt, so the
+       live rAF and the deterministic capture clock agree frame-for-
+       frame. Tail chains take the wag class every tick (merge point
+       5: setWag only re-reads targets — phase and smoothing live
+       inside the chain and are never reset). */
+    if (this.chains.length) {
+      const CC = CHARACTERS[this.char], cvs = CC.canvas || [1600, 1600];
+      const Kx = cvs[0] / (this.charEl.clientWidth || cvs[0]);
+      const Ky = cvs[1] / (this.charEl.clientHeight || cvs[1]);
+      const wagCls = this.wagClass();
+      for (const rec of this.chains) {
+        rec.chain.setAnchor(rec.restAnchor.x + body.x * Kx, rec.restAnchor.y + body.y * Ky);
+        if (rec.geom.wag) rec.chain.setWag(wagCls);
+        rec.stepper.advance(dt);
+        rec.view.update(rec.chain, 1 / Kx, 1 / Ky);
+      }
+    }
   }
 }
 
