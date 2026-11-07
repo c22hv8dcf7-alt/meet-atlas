@@ -73,10 +73,28 @@ const WAG_TUNING = {
     idle:    { hz: 0.7, amp: 0.50, bursts: true }, shy: { hz: 0.8, amp: 0.30 },
     sad:     { hz: 0.0, amp: 0.00, droop: 11 }, angry: { hz: 3.6, amp: 0.10 },
   },
+  /* Milo + Mochi rows are cast-tuning.md §7 converted into the wag
+     driver's class vocabulary (amp normalized: degrees / WAG_MAX_DEG;
+     burstOn/burstOff are [base, span] ms for the idle burst gate —
+     absent = the engine's original windows). Milo: fast and
+     enthusiastic when pleased (2.5–3.5 Hz, ±28°), gentle while
+     talking (1.5 Hz, ±10°), idle bursts ~2 s every ~7 s at ±6°,
+     sad droops +18°. Mochi is lazier at every class: pleased is
+     2.2–3.0 Hz / ±22° (blended with his calmer closed-happy 1.8 Hz /
+     ±16°), talking barely interested (0.9 Hz, ±7°), idle bursts
+     ~1.5 s every ~10 s at 0.25 Hz / ±4°, sad droops +24°, and angry
+     is near-frozen disdain (a slow flick, not a twitch). */
   milo: {
-    excited: { hz: 2.6, amp: 1.00 }, talking: { hz: 1.3, amp: 0.50 },
-    idle:    { hz: 0.8, amp: 0.55, bursts: true }, shy: { hz: 0.9, amp: 0.35 },
-    sad:     { hz: 0.0, amp: 0.00, droop: 12 }, angry: { hz: 3.8, amp: 0.12 },
+    excited: { hz: 3.0, amp: 1.75 }, talking: { hz: 1.5, amp: 0.625 },
+    idle:    { hz: 0.4, amp: 0.375, bursts: true, burstOn: [1800, 600], burstOff: [4000, 2000] },
+    shy:     { hz: 0.8, amp: 0.50 },
+    sad:     { hz: 0.0, amp: 0.00, droop: 18 }, angry: { hz: 6.0, amp: 0.125 },
+  },
+  mochi: {
+    excited: { hz: 2.4, amp: 1.30 }, talking: { hz: 0.9, amp: 0.44 },
+    idle:    { hz: 0.25, amp: 0.25, bursts: true, burstOn: [1300, 400], burstOff: [7500, 3000] },
+    shy:     { hz: 0.6, amp: 0.375 },
+    sad:     { hz: 0.0, amp: 0.00, droop: 24 }, angry: { hz: 0.25, amp: 0.06 },
   },
 };
 const WAG_MAX_DEG = 16;
@@ -97,7 +115,63 @@ const CHARACTERS = {
            mouth: { 1: "talk_half", 2: "talk" },
            jaw: { pivot: "50.5% 35.6%", maxDeg: 10 },
            pivots: { bust: "52% 63%", ribbon: "30% 22%", hairback: "50% 16%", hairfront: "50% 14%" } },
+  /* The cast-production four (cast-tuning.md is the record). Their
+     state files drop the underscores (closedhappy / talkhalf) and
+     their smug is the half-lid plate (halflid) — stateMap translates
+     engine state names to file names. Their blush plate lives inside
+     faces/ (blush: "faces/blush"). No jaw plates were cut for them:
+     with no `jaw` entry the engine speaks through the graded mouth
+     bands (talk_half / talk face plates), exactly as sprite mode
+     does. layerSprings carries cast-tuning's per-layer spring data,
+     merged over the standard tuning in build(); draw order is the
+     tuning record's. Milo + Mochi declare their tail layer, which
+     switches the wag driver on with their own WAG_TUNING rows. */
+  milo:  { label: "Milo", spriteDir: "assets/milo", layerDir: "assets/milo-layers",
+           layers: ["hairback", "tail", "body", "face", "hairfront"],
+           mouth: { 1: "talk_half", 2: "talk" },
+           stateMap: { closed_happy: "closedhappy", talk_half: "talkhalf", smug: "halflid" },
+           blush: "faces/blush",
+           pivots: { hairback: "50% 8%", hairfront: "50% 10%", tail: "74.9% 85.7%" },
+           layerSprings: { hairback: { gainX: 1.40, gainY: 1.25 },
+                           tail: { omega: 9.5, zeta: 0.42, gainX: 1.60, gainY: 1.20, rot: 1.40 } },
+           tail: { layer: "tail" } },
+  juno:  { label: "Juno", spriteDir: "assets/juno", layerDir: "assets/juno-layers",
+           layers: ["hairback", "ponytail", "body", "bust", "whistle", "face", "hairfront"],
+           mouth: { 1: "talk_half", 2: "talk" },
+           stateMap: { closed_happy: "closedhappy", talk_half: "talkhalf", smug: "halflid" },
+           blush: "faces/blush",
+           pivots: { hairback: "50% 10%", hairfront: "50% 12%", ponytail: "59% 11%",
+                     whistle: "48.1% 43.1%", bust: "50% 60%" },
+           layerSprings: { ponytail: { omega: 8.5, zeta: 0.38, gainX: 1.70, gainY: 1.30, rot: 1.50 },
+                           whistle: { omega: 8.0, zeta: 0.45, gainX: 0.80, gainY: 0.90, rot: 1.20 },
+                           bust: { gainX: 0.30, gainY: 0.45, clamp: 5 } } },
+  vesper:{ label: "Vesper", spriteDir: "assets/vesper", layerDir: "assets/vesper-layers",
+           layers: ["veil_a", "veil_b", "body", "bust", "choker", "face", "hairfront"],
+           mouth: { 1: "talk_half", 2: "talk" },
+           stateMap: { closed_happy: "closedhappy", talk_half: "talkhalf", smug: "halflid" },
+           blush: "faces/blush",
+           pivots: { veil_a: "50% 8%", veil_b: "50% 8%", choker: "50.4% 34.5%",
+                     hairfront: "50% 12%", bust: "50% 60%" },
+           layerSprings: { veil_a: { omega: 9.5, zeta: 0.42, gainX: 1.20, gainY: 1.10, rot: 0.30 },
+                           veil_b: { omega: 8.0, zeta: 0.38, gainX: 1.80, gainY: 1.50, rot: 0.70 },
+                           choker: { omega: 11.0, zeta: 0.55, gainX: 0.15, gainY: 0.15, rot: 0.05 },
+                           bust: { omega: 9.0, zeta: 0.48, gainX: 0.28, gainY: 0.40, clamp: 5 } } },
+  mochi: { label: "Mochi", spriteDir: "assets/mochi", layerDir: "assets/mochi-layers",
+           aspect: 1344 / 1728,
+           layers: ["hairback", "tail", "body", "tag", "face", "hairfront"],
+           mouth: { 1: "talk_half", 2: "talk" },
+           stateMap: { closed_happy: "closedhappy", talk_half: "talkhalf", smug: "halflid" },
+           blush: "faces/blush",
+           pivots: { hairback: "50% 8%", hairfront: "50% 10%", tail: "74.8% 78.4%", tag: "47.8% 34.5%" },
+           layerSprings: { hairback: { gainX: 1.30, gainY: 1.15 },
+                           tail: { omega: 9.5, zeta: 0.42, gainX: 1.60, gainY: 1.20, rot: 1.40 },
+                           tag: { omega: 10.0, zeta: 0.50, gainX: 0.25, gainY: 0.30, rot: 0.30 } },
+           tail: { layer: "tail" } },
 };
+/* Engine state name -> the character's actual file basename. Most
+   sets use the engine names verbatim; the cast-production four
+   declare their variants in stateMap. */
+function stateFile(C, state) { return (C.stateMap && C.stateMap[state]) || state; }
 
 /* ---------------- envelope (the pipeline demo's proven RMS approach) ----
    Pre-decode each line with OfflineAudioContext into 30 buckets/second
@@ -226,17 +300,18 @@ class Avatar {
     const ext = C.ext || "png";
     const states = new Set([...EXPRESSIONS, "talk", "talk_half", "blink", "neutral"]);
     for (const s of states) {
-      const a = new Image(); a.src = `${C.spriteDir}/${s}.${ext}`;
-      const b = new Image(); b.src = `${C.layerDir}/faces/${s}.${ext}`;
+      const f = stateFile(C, s);
+      const a = new Image(); a.src = `${C.spriteDir}/${f}.${ext}`;
+      const b = new Image(); b.src = `${C.layerDir}/faces/${f}.${ext}`;
     }
-    const bl = new Image(); bl.src = `${C.layerDir}/blush.${ext}`;
-    const jw = new Image(); jw.src = `${C.layerDir}/jaw.${ext}`;
+    const bl = new Image(); bl.src = `${C.layerDir}/${C.blush || "blush"}.${ext}`;
+    if (C.jaw) { const jw = new Image(); jw.src = `${C.layerDir}/jaw.${ext}`; }
   }
   build() {
     this.charEl.innerHTML = ""; this.layerEls = {}; this.spriteEl = null; this.faceEl = null;
     this.spriteStack = null; this.faceStack = null; this.blushEl = null; this.jawEl = null;
     this.underlayEl = null;
-    this.wag = null; this._wagEl = null;
+    this.wag = null; this._wagEl = null; this._springLayers = [];
     const C = CHARACTERS[this.char];
     this.tuning = {};
     for (const k of Object.keys(SPRING_TUNING))
@@ -290,16 +365,32 @@ class Avatar {
         this.charEl.appendChild(img); this.layerEls[name] = img;
       }
       this.springs = { body: new Spring(SPRING_TUNING.body) };
+      /* Every non-face layer rides its own spring toward the shared
+         performance target. Standard layer names start from the
+         shared tuning table; any layer may then be re-specified per
+         character through CHARACTERS[].layerSprings (cast-tuning's
+         data — tails, ponytails, veils, near-locked patches). The
+         tick applies the list generically, so a new appendage needs
+         data, not engine code. */
+      this._springLayers = [];
       const keyFor = { hairback: "hairBack", hairfront: "hairFront", bust: "bust", ribbon: "ribbon", tail: "tail" };
-      for (const [elName, key] of Object.entries(keyFor))
-        if (this.layerEls[elName]) this.springs[key] = new Spring(SPRING_TUNING[key]);
+      for (const name of Object.keys(this.layerEls)) {
+        const key = keyFor[name];
+        const base = key ? { ...this.tuning[key] }
+                         : { omega: 10.0, zeta: 0.45, gainX: 1.0, gainY: 1.0, rot: 0.0 };
+        const spec = { ...base, ...((C.layerSprings || {})[name] || {}) };
+        const spr = new Spring(spec);
+        this._springLayers.push({ el: this.layerEls[name], spr, tune: spec });
+        if (key) this.springs[key] = spr;
+        this.springs[name] = spr;
+      }
       if (C.tail && this.layerEls[C.tail.layer]) this.setWagLayer(C.tail.layer);
     }
     this.applyExpression();
   }
   _addBlush(C) {
     const img = document.createElement("img");
-    img.src = `${C.layerDir}/blush.${C.ext || "png"}`;
+    img.src = `${C.layerDir}/${C.blush || "blush"}.${C.ext || "png"}`;
     img.alt = ""; img.dataset.layer = "blush";
     img.style.opacity = "0"; img.style.pointerEvents = "none";
     this.charEl.appendChild(img); this.blushEl = img;
@@ -353,8 +444,8 @@ class Avatar {
     const isMouth = face.startsWith("talk") || this._lastFace.startsWith("talk");
     const fade = (face === "blink" || this._lastFace === "blink") ? 45 : isMouth ? 50 : 90;
     this._lastFace = face;
-    if (this.mode === "sprite" && this.spriteStack) this.spriteStack.set(`${C.spriteDir}/${face}.${C.ext || "png"}`, fade);
-    if (this.mode === "layered" && this.faceStack) this.faceStack.set(`${C.layerDir}/faces/${face}.${C.ext || "png"}`, fade);
+    if (this.mode === "sprite" && this.spriteStack) this.spriteStack.set(`${C.spriteDir}/${stateFile(C, face)}.${C.ext || "png"}`, fade);
+    if (this.mode === "layered" && this.faceStack) this.faceStack.set(`${C.layerDir}/faces/${stateFile(C, face)}.${C.ext || "png"}`, fade);
   }
   setExpression(name, withImpulse = true) {
     this.expression = name; this.applyExpression();
@@ -370,6 +461,10 @@ class Avatar {
     if (s.ribbon) s.ribbon.kick(vx * 1.5, vy * 1.2);
     if (s.bust) s.bust.kick(vx * 0.35, vy * 0.55);
     if (s.body) s.body.kick(vx * 0.3, vy * 0.5);
+    if (s.ponytail) s.ponytail.kick(vx * 1.1, vy * 1.0);
+    if (s.veil_a) s.veil_a.kick(vx * 0.7, vy * 0.7);
+    if (s.veil_b) s.veil_b.kick(vx * 1.2, vy * 1.0);
+    if (s.tail) s.tail.kick(vx * 0.3, vy * 0.3);
   }
   async playLine(url) {
     const env = await loadEnvelope(url);
@@ -446,6 +541,8 @@ class Avatar {
       if (S.hairFront) S.hairFront.kick((Math.random() - 0.5) * 34 * ms, -(3 + Math.random() * 8) * ms);
       if (S.ribbon) S.ribbon.kick((Math.random() - 0.5) * 78 * ms, -(5 + Math.random() * 14) * ms);
       if (S.bust) S.bust.kick(0, -(3 + Math.random() * 6) * ms);
+      if (S.ponytail) S.ponytail.kick((Math.random() - 0.5) * 60 * ms, -(4 + Math.random() * 12) * ms);
+      if (S.veil_b) S.veil_b.kick((Math.random() - 0.5) * 64 * ms, -(4 + Math.random() * 10) * ms);
     }
     /* Tail-wag driver: resolves the emotion class, eases hz/amp, and
        writes ONLY the wag spring's target angle (one-writer law). */
@@ -455,7 +552,8 @@ class Avatar {
       if (WT.bursts) {
         if (now >= this.wagGateAt) {
           this.wagGateOn = !this.wagGateOn;
-          this.wagGateAt = now + (this.wagGateOn ? 2200 + Math.random() * 1600 : 2500 + Math.random() * 3000);
+          const onW = WT.burstOn || [2200, 1600], offW = WT.burstOff || [2500, 3000];
+          this.wagGateAt = now + (this.wagGateOn ? onW[0] + Math.random() * onW[1] : offW[0] + Math.random() * offW[1]);
         }
         if (!this.wagGateOn) ampT = 0;
       }
@@ -494,10 +592,7 @@ class Avatar {
       this.jawEl.style.transform = bt + ` rotate(${this.jawSpring.a.toFixed(2)}deg) translateY(${(this.jawA * 7).toFixed(1)}px)`;
       if (this.mouthLevel === 0 && prevA >= 0.03 && this.jawA < 0.03) this.applyExpression();
     }
-    set(this.layerEls.bust, S.bust, this.tuning.bust);
-    set(this.layerEls.hairback, S.hairBack, this.tuning.hairBack);
-    set(this.layerEls.hairfront, S.hairFront, this.tuning.hairFront);
-    set(this.layerEls.ribbon, S.ribbon, this.tuning.ribbon);
+    for (const L of this._springLayers) set(L.el, L.spr, L.tune);
   }
 }
 

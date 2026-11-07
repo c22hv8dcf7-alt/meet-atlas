@@ -75,6 +75,26 @@
   #emoChip { background: #e8f0f0; color: #0f3d3e; border: 1px solid #b7d2d2; }
   .show { opacity: 1 !important; }
   .controls { margin-top: 10px; }
+  .castrow {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;
+  }
+  .castlabel {
+    font-family: 'DejaVu Sans', sans-serif; font-size: 12px; letter-spacing: .08em;
+    color: #6b5b3e; margin-right: 2px;
+  }
+  .castchip {
+    display: flex; align-items: center; gap: 7px; cursor: pointer;
+    font-family: 'DejaVu Sans', sans-serif; font-size: 13px;
+    background: #fffdf7; color: #0f3d3e; border: 1.5px solid #b49b62; border-radius: 999px;
+    padding: 3px 12px 3px 4px; transition: border-color .15s, background .15s, color .15s;
+  }
+  .castchip img {
+    width: 30px; height: 30px; border-radius: 50%; object-fit: cover; object-position: 50% 12%;
+    background: #e9dcbf; user-select: none; -webkit-user-drag: none;
+  }
+  .castchip:hover:not(:disabled) { border-color: #0f3d3e; }
+  .castchip.on { background: #0f3d3e; color: #f3e9d2; border-color: #0f3d3e; }
+  .castchip:disabled { opacity: .45; cursor: wait; }
   .askrow { display: flex; gap: 8px; flex-wrap: wrap; }
   .askbtn {
     font-family: 'DejaVu Sans', sans-serif; font-size: 13.5px; cursor: pointer;
@@ -113,7 +133,7 @@
   <span>A scripted taste of Presence. The real thing runs on your own Mac, offline, answering from your full library — this page answers from a handful of fixture lines.</span>
 </div>
 <header>
-  <div class="title"><b>ATLAS PRESENCE</b> — MEET PAIGE</div>
+  <div class="title" id="meetTitle"><b>ATLAS PRESENCE</b> — MEET PAIGE</div>
   <div id="stateChip"><span class="dot">●</span> <span id="stateText">waking her up…</span></div>
 </header>
 <main>
@@ -133,6 +153,15 @@
     </div>
   </div>
   <div class="controls">
+    <div class="castrow" id="castRow">
+      <span class="castlabel">ON SCREEN:</span>
+      <button type="button" class="castchip on" data-char="paige"><img src="assets/paige/neutral.webp" alt="">Paige</button>
+      <button type="button" class="castchip" data-char="clem"><img src="assets/clem/neutral.webp" alt="">Clementine</button>
+      <button type="button" class="castchip" data-char="milo"><img src="assets/milo/neutral.webp" alt="">Milo</button>
+      <button type="button" class="castchip" data-char="juno"><img src="assets/juno/neutral.webp" alt="">Juno</button>
+      <button type="button" class="castchip" data-char="vesper"><img src="assets/vesper/neutral.webp" alt="">Vesper</button>
+      <button type="button" class="castchip" data-char="mochi"><img src="assets/mochi/neutral.webp" alt="">Mochi</button>
+    </div>
     <div class="askrow" id="chipRow">
       <button type="button" class="askbtn" data-ask="mayfly">Is this a mayfly?</button>
       <button type="button" class="askbtn" data-ask="weather">What's the weather in Tokyo?</button>
@@ -145,7 +174,7 @@
       <button id="askSubmit" type="submit">Ask</button>
     </form>
   </div>
-  <div id="fineprint">On screen: Paige — Atlas Presence's own lead, drawn for the cast and performed by our sprite + spring-physics stage (rigid layers, not a mesh rig — her hair and ribbon ride real springs) · Voice: Piper (en_US-amy-medium), rendered locally · Answers: Presence Contract fixture set · Everything on this page runs locally in your browser — nothing is sent anywhere</div>
+  <div id="fineprint">On screen: Paige — Atlas Presence's own lead, drawn for the cast and performed by our sprite + spring-physics stage (rigid layers, not a mesh rig — her hair rides real springs) · Voice: Piper (en_US-amy-medium), rendered locally · Answers: Presence Contract fixture set · Everything on this page runs locally in your browser — nothing is sent anywhere</div>
 </footer>
 
 <audio id="voice" preload="auto"></audio>
@@ -167,23 +196,20 @@
   // the fallback is honest about this demo's limits.
   // ---------------------------------------------------------------------------
   var REFUSAL = "That's not in the library.";
-  var FIXTURES = {
-    mayfly: {
-      q: "Is this a mayfly? It has three tails and one pair of wings.",
-      reply: "Three tails and one pair of wings — that's a mayfly, order Ephemeroptera. " +
-             "In your creek work they're a good sign: most mayflies only thrive in well-oxygenated water.",
-      citations: ["Creekside Field Guide, 'Mayflies' (p. 41)"],
-      emotion: "happy", audio: "audio/line_mayfly.wav"
-    },
+  var MAYFLY_Q = "Is this a mayfly? It has three tails and one pair of wings.";
+  var MAYFLY_CITE = ["Creekside Field Guide, 'Mayflies' (p. 41)"];
+  // Shared turns: the weather refusal is byte-exact by law and identical
+  // in every mouth, so it (and the product-shaped cast / offline /
+  // fallback lines) keeps the one shared fixture voice line. The
+  // greeting and the mayfly answer are persona lines — each cast member
+  // has their own text (DRAFT copy, Levi's grade pending) and their own
+  // rendered line, persona framing around the same grounded facts; the
+  // mayfly citation itself never varies.
+  var SHARED = {
     weather: {
       q: "What's the weather like in Tokyo right now?",
       reply: REFUSAL, citations: [], emotion: "relaxed",
       audio: "audio/line_refusal.wav"
-    },
-    hello: {
-      q: "Hello — I'm back.",
-      reply: "You're back. Last time you were sorting the Quittapahilla samples — the scuds were winning.",
-      citations: [], emotion: "relaxed", audio: "audio/line_hello.wav"
     },
     cast: {
       q: "Who else is in the cast?",
@@ -204,6 +230,105 @@
       citations: [], emotion: "relaxed", audio: "audio/line_fallback.wav"
     }
   };
+  var FIXTURES = {
+    paige: Object.assign({}, SHARED, {
+      mayfly: {
+        q: MAYFLY_Q,
+        reply: "Three tails and one pair of wings — that's a mayfly, order Ephemeroptera. " +
+               "In your creek work they're a good sign: most mayflies only thrive in well-oxygenated water.",
+        citations: MAYFLY_CITE, emotion: "happy", audio: "audio/line_mayfly.wav"
+      },
+      hello: {
+        q: "Hello — I'm back.",
+        reply: "You're back. Last time you were sorting the Quittapahilla samples — the scuds were winning.",
+        citations: [], emotion: "relaxed", face: "closed_happy", audio: "audio/line_hello.wav"
+      }
+    }),
+    clem: Object.assign({}, SHARED, {
+      mayfly: {
+        q: MAYFLY_Q,
+        reply: "Three tails and one pair of wings — that's a mayfly, darling, order Ephemeroptera. " +
+               "And it's good news for your creek, too: most mayflies only thrive in well-oxygenated water, so they're a good sign.",
+        citations: MAYFLY_CITE, emotion: "happy", audio: "audio/line_clem_mayfly.wav"
+      },
+      hello: {
+        q: "Hello — I'm back.",
+        reply: "Well, look who's back. Sit, sit — I was just pulling something sweet out of the oven, " +
+               "and nobody should face a library on an empty stomach.",
+        citations: [], emotion: "happy", audio: "audio/line_clem_hello.wav"
+      }
+    }),
+    milo: Object.assign({}, SHARED, {
+      mayfly: {
+        q: MAYFLY_Q,
+        reply: "Three tails and one pair of wings? That's a mayfly — order Ephemeroptera. " +
+               "Even I know that one, and I mostly just draw them. Good news for your creek, though: " +
+               "most mayflies only thrive in well-oxygenated water, so they're a good sign.",
+        citations: MAYFLY_CITE, emotion: "happy", audio: "audio/line_milo_mayfly.wav"
+      },
+      hello: {
+        q: "Hello — I'm back.",
+        reply: "Oh, you're back. I was sketching the others to pass the time — don't worry, I made you look good. You're welcome.",
+        citations: [], emotion: "smug", audio: "audio/line_milo_hello.wav"
+      }
+    }),
+    juno: Object.assign({}, SHARED, {
+      mayfly: {
+        q: MAYFLY_Q,
+        reply: "Three tails, one pair of wings — mayfly! Order Ephemeroptera, no contest. " +
+               "And it's a good sign for your creek: most mayflies only thrive in well-oxygenated water.",
+        citations: MAYFLY_CITE, emotion: "proud", audio: "audio/line_juno_mayfly.wav"
+      },
+      hello: {
+        q: "Hello — I'm back.",
+        reply: "There you are! I was about to start without you — come on, samples to sort, daylight to burn.",
+        citations: [], emotion: "happy", audio: "audio/line_juno_hello.wav"
+      }
+    }),
+    vesper: Object.assign({}, SHARED, {
+      mayfly: {
+        q: MAYFLY_Q,
+        reply: "Three tails. One pair of wings. A mayfly — Ephemeroptera, if we're being formal. " +
+               "Your creek should be pleased: most mayflies only thrive in well-oxygenated water. They're a good sign.",
+        citations: MAYFLY_CITE, emotion: "relaxed", audio: "audio/line_vesper_mayfly.wav"
+      },
+      hello: {
+        q: "Hello — I'm back.",
+        reply: "Oh. You're back. I kept the dark corner for you.",
+        citations: [], emotion: "relaxed", audio: "audio/line_vesper_hello.wav"
+      }
+    }),
+    mochi: Object.assign({}, SHARED, {
+      mayfly: {
+        q: MAYFLY_Q,
+        reply: "Three tails and one pair of wings — a mayfly, order Ephemeroptera. Even half-asleep, I know that one. " +
+               "Most mayflies only thrive in well-oxygenated water, so your creek is doing well. You're welcome.",
+        citations: MAYFLY_CITE, emotion: "smug", audio: "audio/line_mochi_mayfly.wav"
+      },
+      hello: {
+        q: "Hello — I'm back.",
+        reply: "Mm. You're back. You may stay — I saved this spot for you, not that I'd admit it.",
+        citations: [], emotion: "smug", audio: "audio/line_mochi_hello.wav"
+      }
+    })
+  };
+  // Per-character stage dressing (all DRAFT copy): header name, the
+  // settling-in line, and the fineprint's on-screen sentence.
+  var META = {
+    paige:  { title: "PAIGE", intro: "She's here. Ask her something — the chips are a good start.",
+              fp: "Paige — Atlas Presence's own lead, drawn for the cast and performed by our sprite + spring-physics stage (rigid layers, not a mesh rig — her hair rides real springs)" },
+    clem:   { title: "CLEMENTINE", intro: "She's here. Ask her something — the chips are a good start.",
+              fp: "Clementine — the cast's baker, drawn for the cast and performed by our sprite + spring-physics stage (rigid layers, not a mesh rig — her hair and her ribbon ride real springs)" },
+    milo:   { title: "MILO", intro: "He's here. Ask him something — the chips are a good start.",
+              fp: "Milo — the cast's artist, drawn for the cast and performed by our sprite + spring-physics stage (rigid layers, not a mesh rig — his ears, hair and tail ride real springs, and his tail wags when he's pleased)" },
+    juno:   { title: "JUNO", intro: "She's here. Ask her something — the chips are a good start.",
+              fp: "Juno — the cast's track captain, drawn for the cast and performed by our sprite + spring-physics stage (rigid layers, not a mesh rig — her ponytail rides a real spring)" },
+    vesper: { title: "VESPER", intro: "She's here. Ask her something — the chips are a good start.",
+              fp: "Vesper — the cast's sharp one, drawn for the cast and performed by our sprite + spring-physics stage (rigid layers, not a mesh rig — her long veil rides real springs)" },
+    mochi:  { title: "MOCHI", intro: "He's here. Ask him something — the chips are a good start.",
+              fp: "Mochi — the cast's good boy, drawn for the cast and performed by our sprite + spring-physics stage (rigid layers, not a mesh rig — his tail wags, lazily, when he approves)" }
+  };
+  var current = "paige";
   var MATCHERS = [
     ["mayfly",  /mayfly|three tails|ephemeroptera/],
     ["weather", /weather|tokyo|forecast|temperature|raining|snow/],
@@ -218,10 +343,11 @@
     }
     return "fallback";
   }
-  // Contract emotion tags -> Paige's sprite states (the sprite tier's map).
+  // Contract emotion tags -> sprite states (the sprite tier's map; the
+  // engine translates a state name to each character's own file name).
   var EXPRESSION_FOR = { happy: "happy", relaxed: "neutral", proud: "proud",
                          sad: "sad", surprised: "surprised", angry: "angry",
-                         thinking: "thinking", shy: "shy" };
+                         thinking: "thinking", shy: "shy", smug: "smug" };
 
   function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   function fail(msg) {
@@ -231,18 +357,23 @@
     window.__demoError = msg;
   }
 
-  window.PresenceStage.CHARACTERS.paige.ext = "webp";
+  Object.keys(window.PresenceStage.CHARACTERS).forEach(function (id) {
+    window.PresenceStage.CHARACTERS[id].ext = "webp";
+  });
   var avatar = new window.PresenceStage.Avatar(charEl, $("voice"), function () {});
   window.__avatar = avatar;
 
   function fit() {
     var w = stageEl.clientWidth, h = stageEl.clientHeight;
     if (!w || !h) return;
-    // Waist-up art: size her so the figure fills the window height —
+    // Waist-up art: size the figure so it fills the window height —
     // the ~3% overflow eats only the canvas's empty headroom above
-    // her hair; her chest stays clear of the caption card below.
-    var cs = Math.min(h * 1.03, w * 0.94);
-    charEl.style.width = cs + "px"; charEl.style.height = cs + "px";
+    // the hair; the chest stays clear of the caption card below. The
+    // box follows the character's own canvas aspect (Mochi's set is
+    // portrait; the rest are square).
+    var asp = (window.PresenceStage.CHARACTERS[current] || {}).aspect || 1;
+    var bw = Math.min(w * 0.94, h * 1.03 * asp);
+    charEl.style.width = bw + "px"; charEl.style.height = (bw / asp) + "px";
   }
   window.addEventListener("resize", fit); fit();
 
@@ -257,14 +388,14 @@
   var busy = false;
   function setBusy(b) {
     busy = b;
-    var btns = document.querySelectorAll(".askbtn");
+    var btns = document.querySelectorAll(".askbtn, .castchip");
     for (var i = 0; i < btns.length; i++) btns[i].disabled = b;
     askInput.disabled = b; askSubmit.disabled = b;
   }
 
   async function doAsk(key, typedText) {
     if (busy) return;
-    var fx = FIXTURES[key];
+    var fx = FIXTURES[current][key];
     setBusy(true);
     citeChip.classList.remove("show"); emoChip.classList.remove("show");
     replyEl.classList.remove("show");
@@ -272,9 +403,10 @@
     questionEl.classList.add("show");
     zoomTarget = 1.05;
     await sleep(650);
-    // The greeting reads best as closed-happy (^^) — a demo-wiring
-    // special case; the contract emotion text on the chip is unchanged.
-    avatar.setExpression(key === "hello" ? "closed_happy" : (EXPRESSION_FOR[fx.emotion] || "neutral"), false);
+    // A fixture may pin its own face (Paige's greeting reads best as
+    // closed-happy ^^); otherwise the contract emotion maps through.
+    // The emotion text on the chip is unchanged either way.
+    avatar.setExpression(fx.face || EXPRESSION_FOR[fx.emotion] || "neutral", false);
     replyEl.textContent = "“" + fx.reply + "”";
     replyEl.classList.add("show");
     if (fx.citations && fx.citations.length) {
@@ -284,7 +416,7 @@
     emoChip.textContent = "emotion: " + fx.emotion + " · sprite state + spring physics (Presence Rig Standard v0.1)";
     emoChip.classList.add("show");
     await avatar.playLine(fx.audio);
-    window.__lastTurn = { key: key, reply: fx.reply, emotion: fx.emotion, citations: fx.citations };
+    window.__lastTurn = { char: current, key: key, reply: fx.reply, emotion: fx.emotion, citations: fx.citations };
     await sleep(1300);
     avatar.setExpression("neutral", false);
     zoomTarget = 1;
@@ -292,6 +424,38 @@
     citeChip.classList.remove("show"); emoChip.classList.remove("show");
     setBusy(false);
   }
+
+  // Character switcher: swap the full set + tuning + persona fixtures
+  // in one move. Refused mid-turn (the buttons disable while busy, and
+  // this guards the programmatic path too) so the stage never changes
+  // cast halfway through a line.
+  var fineprintEl = $("fineprint");
+  function setFineprint() {
+    fineprintEl.textContent = "On screen: " + META[current].fp +
+      " · Voice: Piper (en_US-amy-medium), rendered locally · Answers: Presence Contract fixture set · " +
+      "Everything on this page runs locally in your browser — nothing is sent anywhere";
+  }
+  function switchChar(id) {
+    if (busy || id === current || !FIXTURES[id]) return;
+    current = id;
+    avatar.setChar(id);
+    document.querySelectorAll(".castchip").forEach(function (chip) {
+      chip.classList.toggle("on", chip.getAttribute("data-char") === id);
+    });
+    $("meetTitle").innerHTML = "<b>ATLAS PRESENCE</b> — MEET " + META[id].title;
+    citeChip.classList.remove("show"); emoChip.classList.remove("show");
+    questionEl.classList.remove("show");
+    replyEl.textContent = META[id].intro;
+    replyEl.classList.add("show");
+    setFineprint();
+    fit();
+    window.__currentChar = id;
+  }
+  document.querySelectorAll(".castchip").forEach(function (chip) {
+    chip.addEventListener("click", function () { switchChar(chip.getAttribute("data-char")); });
+  });
+  window.__switchChar = switchChar;
+  window.__currentChar = current;
 
   document.querySelectorAll(".askbtn").forEach(function (btn) {
     btn.addEventListener("click", function () { doAsk(btn.getAttribute("data-ask"), null); });
@@ -304,7 +468,8 @@
   });
 
   stateText.textContent = "contract atlas-presence/1 · presence: on_screen · ambient: reading · evening";
-  replyEl.textContent = "She's here. Ask her something — the chips are a good start.";
+  setFineprint();
+  replyEl.textContent = META.paige.intro;
   replyEl.classList.add("show");
   window.__demoReady = true;
 })();
