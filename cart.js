@@ -30,6 +30,9 @@
      has a real downloadable asset in catalog.json. If a name is not in the
      catalog, it cannot be added — the cart only carries real files. */
   var ITEM_META = {
+    "atlas-mac.zip":                { label: "Atlas for Mac",                  slug: "atlas-mac",       kindLabel: "Atlas itself" },
+    "atlas-linux.tar.gz":           { label: "Atlas for Linux",                slug: "atlas-linux",     kindLabel: "Atlas itself" },
+    "atlas-chromebook.tar.gz":      { label: "Atlas for Chromebook",           slug: "atlas-chromebook", kindLabel: "Atlas itself" },
     "paige-presence-pack.zip":      { label: "Paige — the Lead",               slug: "paige" },
     "mochi-presence-pack.zip":      { label: "Mochi — the Good Boy",           slug: "mochi" },
     "vesper-presence-pack.zip":     { label: "Vesper — the Sharp One",         slug: "vesper" },
@@ -42,9 +45,12 @@
     "app-darkroom.zip":             { label: "The Darkroom",                   slug: "darkroom" }
   };
 
-  /* The Atlas installers themselves — offered alongside the bundle for
-     people who don't have Atlas yet. The installers are never IN the cart
-     and never inside the bundle; they are unchanged release downloads. */
+  /* The Atlas installers themselves. They wear two hats: offered as plain
+     links in the newcomer panel for people who don't have Atlas yet, and —
+     since Levi's 2026-11-10 ruling — ordinary cart items too: an edition in
+     the cart rides inside the bundle like any other piece, and the cart
+     page then hides the newcomer panel (its owner already has an installer)
+     and explains the two steps (installer first, then open the bundle). */
   var EDITION_META = {
     "atlas-mac.zip":         "Atlas for Mac",
     "atlas-linux.tar.gz":    "Atlas for Linux",
@@ -236,6 +242,9 @@
             "<p class=\"cart-error\" id=\"cart-error\" role=\"alert\" hidden></p>" +
             "<p class=\"cart-after\">When the bundle lands, open it with Atlas. He checks the seal on every piece, installs everything in one go, and tells you in chat what he did — in plain sentences.</p>"
           : "<p class=\"cart-notice\" id=\"cart-notice\">Bundle building arrives with the Answer Service — your cart is saved in this browser. Every item can still be downloaded on its own from its page.</p>") +
+        /* Shown only while an Atlas edition is in the cart, in either build
+           state: the two steps, in plain words. Filled in by render(). */
+        "<p class=\"cart-edition-note\" id=\"cart-edition-note\" hidden></p>" +
       "</div>";
 
     els.items = mount.querySelector("#cart-items");
@@ -243,6 +252,8 @@
     els.body = mount.querySelector("#cart-checkout-body");
     els.totalRow = mount.querySelector("#cart-totalrow");
     els.grandTotal = mount.querySelector("#cart-grandtotal");
+    els.newPanel = mount.querySelector("#cart-new");
+    els.editionNote = mount.querySelector("#cart-edition-note");
     els.editions = mount.querySelector("#cart-editions");
     els.build = mount.querySelector("#cart-build");
     els.progress = mount.querySelector("#cart-progress");
@@ -315,17 +326,22 @@
       li.className = "cart-item";
       li.innerHTML =
         "<span class=\"cart-item-name\"></span>" +
+        "<span class=\"cart-item-kind\" hidden></span>" +
         "<span class=\"cart-item-size\"></span>" +
         "<a class=\"cart-direct cart-item-dl\" hidden></a>" +
         "<button type=\"button\" class=\"cart-remove\">Remove</button>";
       li.querySelector(".cart-item-name").textContent = meta ? meta.label : name;
+      var kindEl = li.querySelector(".cart-item-kind");
+      if (meta && meta.kindLabel) { kindEl.textContent = meta.kindLabel; kindEl.hidden = false; }
       li.querySelector(".cart-item-size").textContent = a ? fmtSize(a.size_bytes) : "";
       // The same quiet direct-download fallback the source pages carry, so
       // a cart row is never a dead end — bundle or no bundle.
       var dl = li.querySelector(".cart-item-dl");
       if (a && a.download_url) {
         dl.href = a.download_url;
-        dl.textContent = a.kind === "companion-app" ? "or download just this app" : "or download just this pack";
+        dl.textContent = a.kind === "companion-app" ? "or download just this app"
+          : a.kind === "atlas-edition" ? "or download just this edition"
+          : "or download just this pack";
         dl.hidden = false;
       }
       li.querySelector(".cart-remove").addEventListener("click", function () { removeFromCart(name); });
@@ -335,6 +351,26 @@
     els.empty.hidden = has;
     if (els.body) els.body.hidden = !has;
     els.grandTotal.textContent = fmtSize(totalBytes());
+
+    /* An Atlas edition in the cart changes two things here: the newcomer
+       panel's separate installer links hide (this cart already carries an
+       installer), and the two steps get said plainly. Two or more editions
+       earn one gentle extra line. */
+    var eds = cart.filter(function (n) { return !!EDITION_META[n]; });
+    if (els.newPanel) els.newPanel.hidden = eds.length > 0;
+    if (els.editionNote) {
+      if (eds.length > 0) {
+        var noteText = "Your cart holds Atlas itself, so there's no separate installer to fetch. " +
+          "Run the Atlas installer from your bundle first — then open the bundle in Atlas and it installs everything else.";
+        if (eds.length > 1) {
+          noteText += " One edition per computer — extra editions in the bundle are harmless, just unused.";
+        }
+        els.editionNote.textContent = noteText;
+        els.editionNote.hidden = false;
+      } else {
+        els.editionNote.hidden = true;
+      }
+    }
   }
 
   /* ---------- Cart operations ---------- */

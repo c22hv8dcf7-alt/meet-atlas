@@ -25,6 +25,32 @@
 button.cart-add{ font-family:var(--sans); }
 .cart-add.cart-in{ background:var(--teal-dark); color:#fff; }
 
+/* The secondary add-to-cart, used beside a primary download button (the
+   Atlas edition cards): the direct download stays the loud one; taking
+   Atlas into the cart is the quiet option next to it. An outline, not a
+   fill — until it's picked, when it takes the usual "in cart" dress. */
+button.cart-add-sec{
+  background:transparent; color:var(--teal-dark);
+  border:1.5px solid var(--teal-dark); box-shadow:none;
+}
+button.cart-add-sec:hover{ filter:none; background:rgba(20,90,80,.07); }
+.plat .pbody .btn.cart-add-sec{ margin-top:10px; align-self:flex-start; }
+.cart-add-sec.cart-in{ background:var(--teal-dark); color:#fff; }
+
+/* The little kind chip on a cart row — "Atlas itself" on an edition. */
+.cart-item-kind{
+  font-size:.76rem; font-weight:600; color:var(--teal-dark);
+  border:1px solid var(--line); border-radius:999px;
+  padding:.12em .6em; white-space:nowrap;
+}
+
+/* The two-step note that stands on the cart page while an Atlas edition
+   is in the cart, in either build state. */
+.cart-edition-note{
+  margin-top:14px; border:1px solid var(--line); border-radius:12px;
+  background:var(--cream); padding:12px 14px; font-size:.95rem; color:var(--ink);
+}
+
 /* The persistent cart bar — a slim deep-ink strip fixed to the bottom of
    the viewport, echoing the site header. It appears only while the cart
    holds something; an empty cart leaves no furniture behind. The body
