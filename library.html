@@ -21,6 +21,7 @@
 {"@context":"https://schema.org","@type":"WebSite","name":"Meet Atlas","alternateName":"Atlas","publisher":{"@type":"Organization","name":"Porch Light"}}
 </script>
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="cart.css">
 <style>
 /* Library page — the shelf. lib- classes only; cards mirror the home page's pack cards. KEEP at deploy. */
 .lib-grid{margin-top:30px}
@@ -62,7 +63,7 @@
   <h2>Built one at a time, <span class="k">in this order</span></h2>
   <p class="lede">The order below is the build order, and it's public. One pack is on the shelf today; the rest are in development, and each will arrive the way Everyday Knowledge did — curated, examined, signed, free.</p>
   <div class="grid lib-grid">
-    <div class="card lib-card"><span class="ic">▦</span><h3>Everyday Knowledge</h3><p>A full encyclopedia shelf — 10,606 articles on how the world works, chosen for the questions people actually ask.</p><p class="lib-meta"><span class="lib-size">98.9 MB</span><span class="lib-status">Free download — sealed with the Porch Light release key</span></p><a class="btn lib-dl" href="https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/pack-everyday.zip">Download free</a></div>
+    <div class="card lib-card"><span class="ic">▦</span><h3>Everyday Knowledge</h3><p>A full encyclopedia shelf — 10,606 articles on how the world works, chosen for the questions people actually ask.</p><p class="lib-meta"><span class="lib-size">98.9 MB</span><span class="lib-status">Free download — sealed with the Porch Light release key</span></p><button class="btn lib-dl cart-add" type="button" data-cart-add="pack-everyday.zip">Add to cart</button><a class="cart-direct" href="https://github.com/c22hv8dcf7-alt/meet-atlas/releases/latest/download/pack-everyday.zip">or download just this pack</a></div>
     <div class="card lib-card"><span class="ic">✎</span><h3>Study Hall</h3><p>Complete open textbooks — maths, science, history, writing. A school year of homework help that needs no internet and no tutor. Now with courses — lessons and progress, not just articles.</p><p class="lib-meta"><span class="lib-size">≈ 30 MB</span><span class="lib-status">In development</span></p></div>
     <div class="card lib-card"><span class="ic">💻</span><h3>Code &amp; Computers</h3><p>Learning to program entirely offline, from open textbooks only — four volumes: Learn, Reference, Practice &amp; Debugging, and Ship. Its Core volumes are third in the build order; the Full edition follows.</p><p class="lib-meta"><span class="lib-size">Core / Full depths</span><span class="lib-status">In development</span></p></div>
     <div class="card lib-card"><span class="ic">🌿</span><h3>Creekside</h3><p>Our signature: water, ecology, field identification, the living world of creeks and watersheds — field-guide deep.</p><p class="lib-meta"><span class="lib-size">≈ 12 MB</span><span class="lib-status">In development</span></p></div>
@@ -121,5 +122,7 @@
   </div>
   <p class="fineprint">© 2026 Porch Light, publisher. Atlas™ is free from this official site only, under the Atlas Free-Use License — free to use forever; never to pass on, sell, or rebrand. Atlas is an independent project. TANNIS is a product of Titan Gauntlets; this site is not affiliated with or endorsed by Titan Gauntlets, and comparisons are drawn from their public product page (checked November 4, 2026). Atlas runs on open models (including Qwen, via Ollama) — their licences are listed in the app.</p>
 </div></footer>
+<script src="assets/jszip.min.js"></script>
+<script src="cart.js"></script>
 </body>
 </html>

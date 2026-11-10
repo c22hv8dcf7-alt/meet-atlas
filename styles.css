@@ -579,3 +579,14 @@ nav.main{flex:1 1 auto;min-width:0;flex-wrap:wrap;justify-content:flex-end;row-g
 nav.shelf{flex:1 1 100%;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end;margin-top:2px}
 nav.shelf .btn.navthemes{margin-left:0}
 @media (max-width:760px){nav.shelf{justify-content:flex-start}}
+
+/* ===== Homepage Presence band (staged 2026-11-10) =====
+   pb- classes only; section reuses section/.wrap/.kicker/h2/.lede/.btn.
+   Paige proof video left, copy right; stacks on small screens. */
+.pb-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:36px;align-items:center}
+.pb-video{width:100%;display:block;border-radius:16px;background:var(--ink);box-shadow:0 2px 6px rgba(10,17,34,.05),0 16px 36px rgba(10,17,34,.12)}
+.pb-copy h2{margin-top:10px}
+.pb-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.pb-chips span{font-size:.8rem;font-weight:700;letter-spacing:.05em;padding:5px 13px;border-radius:999px;background:rgba(30,201,182,.13);border:1px solid rgba(13,124,110,.32);color:var(--teal-dark)}
+.pb-cta{margin-top:26px}
+@media (max-width:860px){.pb-grid{grid-template-columns:1fr}}

@@ -1,0 +1,146 @@
+/* Meet Atlas — the shelf cart.
+   Dressed in the site's own colours: cream paper, deep teal, a little gold.
+   The cart is one shared piece of furniture on every page — a slim bar at
+   the foot of the page, and the cart page it leads to — and it never
+   restyles the page it sits on. */
+
+/* The quiet fallback link beside every Add to cart button: the original
+   direct download, kept for anyone who wants just the one file. */
+.cart-direct{
+  display:inline-block; margin-left:12px; font-size:.82rem;
+  color:var(--muted); text-decoration:underline; text-underline-offset:3px;
+}
+.cart-direct:hover{ color:var(--teal-dark); }
+
+/* Interim notice on the cart page, standing where the Build button will
+   stand once bundle building arrives with the Answer Service host. */
+.cart-notice{
+  border:1px solid var(--line); border-radius:12px;
+  background:var(--cream); padding:14px 16px; color:var(--ink);
+}
+.rm-download .cart-direct{ display:block; margin:10px 0 0; }
+
+/* Add-to-cart buttons keep the site's .btn dress; this only marks the
+   "already picked" state. */
+button.cart-add{ font-family:var(--sans); }
+.cart-add.cart-in{ background:var(--teal-dark); color:#fff; }
+
+/* The persistent cart bar — a slim deep-ink strip fixed to the bottom of
+   the viewport, echoing the site header. It appears only while the cart
+   holds something; an empty cart leaves no furniture behind. The body
+   gains matching padding so the bar never covers the footer. */
+.cartbar{
+  position:fixed; left:0; right:0; bottom:0; z-index:60;
+  min-height:44px; box-sizing:border-box;
+  display:flex; align-items:center; justify-content:flex-end; gap:14px;
+  padding:6px max(16px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom));
+  background:var(--ink); color:var(--cream);
+  box-shadow:0 -4px 18px rgba(10,17,34,.28);
+  font-size:.95rem;
+}
+.cartbar[hidden]{ display:none; }
+body.cartbar-on{ padding-bottom:52px; }
+
+.cartbar-msg{ color:var(--teal); font-weight:600; white-space:nowrap; }
+.cartbar-summary{ white-space:nowrap; }
+.cartbar .cart-count{
+  display:inline-block; min-width:1.5em; text-align:center;
+  background:var(--amber); color:var(--ink); border-radius:999px;
+  font-weight:700; padding:0 .3em; margin-left:.15em;
+}
+.cartbar .cart-total{ color:var(--cream); opacity:.85; }
+.cartbar-see{
+  font:inherit; font-weight:700; white-space:nowrap; cursor:pointer;
+  background:var(--amber); color:var(--ink); text-decoration:none;
+  border-radius:999px; padding:.34em 1.1em;
+}
+.cartbar-see:hover{ background:var(--teal); color:var(--ink2); }
+
+/* The little pulse when something is picked. */
+@keyframes cartbar-pulse{
+  0%{ box-shadow:0 -4px 18px rgba(10,17,34,.28), inset 0 3px 0 var(--amber); }
+  100%{ box-shadow:0 -4px 18px rgba(10,17,34,.28), inset 0 0 0 transparent; }
+}
+.cartbar-flash{ animation:cartbar-pulse 1.1s ease-out 2; }
+
+/* The cart page's checkout column — the pieces below used to live in a
+   drawer; on cart.html they sit in the page's own wrap, a comfortable
+   reading width, in the same dress. */
+.cart-checkout-col{ max-width:760px; }
+.cart-explain{ color:var(--ink2); font-size:1.02rem; }
+
+.cart-items{ list-style:none; margin:18px 0 0; padding:0; }
+.cart-item{
+  display:flex; align-items:center; gap:10px;
+  padding:10px 0; border-top:1px solid var(--line);
+}
+.cart-item-name{ flex:1; font-weight:600; color:var(--ink); }
+.cart-item-size{ color:var(--muted); font-size:.9rem; white-space:nowrap; }
+.cart-remove{
+  font:inherit; font-size:.85rem; cursor:pointer;
+  background:none; border:1px solid var(--line); border-radius:999px;
+  padding:.2em .8em; color:var(--muted);
+}
+.cart-remove:hover{ color:#a33; border-color:#a33; }
+
+.cart-empty{ margin-top:18px; color:var(--ink2); font-size:1.02rem; }
+.cart-empty p{ margin:0 0 8px; }
+.cart-empty-links{ color:var(--muted); }
+
+.cart-totalrow{
+  display:flex; justify-content:space-between; align-items:baseline;
+  border-top:2px solid var(--goldline); margin-top:14px; padding-top:12px;
+  font-size:1.02rem; color:var(--ink);
+}
+.cart-totalrow b{ font-size:1.15rem; }
+
+.cart-new{
+  margin-top:16px; background:var(--cream); border:1px solid var(--line);
+  border-radius:12px; padding:12px 14px; font-size:.92rem;
+}
+.cart-editions{ margin-top:6px; }
+.cart-editions a{ white-space:nowrap; }
+
+/* Choose her brain — checkout's second question. Four cards: the local
+   brain (the default) and the visitor's own account with each big AI
+   company, plus one quiet line for the credits door, which opens with the
+   Answer Service. */
+.cart-brain{ margin-top:18px; border:1px solid var(--line); border-radius:12px; padding:14px; }
+.cart-brain legend{
+  font-family:var(--serif); font-size:1.15rem; color:var(--ink);
+  padding:0 6px;
+}
+.cart-brain-note{ font-size:.92rem; color:var(--ink2); }
+.brain-card{
+  display:flex; gap:10px; align-items:flex-start; cursor:pointer;
+  border:1px solid var(--line); border-radius:12px;
+  background:#fff; padding:11px 12px; margin-top:10px;
+}
+.brain-card:hover{ border-color:var(--teal); }
+.brain-card.brain-on{ border-color:var(--teal-dark); box-shadow:0 0 0 1px var(--teal-dark); background:#f2fbf8; }
+.brain-card input{ margin-top:4px; accent-color:var(--teal-dark); }
+.brain-body{ display:block; }
+.brain-body b{ color:var(--ink); }
+.brain-text{ display:block; font-size:.9rem; color:var(--text); margin-top:2px; }
+.brain-link{ display:inline-block; margin-top:6px; font-size:.9rem; }
+.brain-placeholder{
+  margin-top:12px; font-size:.9rem; color:var(--muted);
+  border:1px dashed var(--line); border-radius:12px; padding:10px 12px;
+}
+.brain-honest{ margin-top:10px; font-size:.86rem; color:var(--muted); }
+
+.cart-build{ width:100%; margin-top:18px; font-size:1.05rem; }
+.cart-build:disabled{ opacity:.45; cursor:not-allowed; }
+
+.cart-progress{ margin-top:12px; color:var(--teal-dark); min-height:1.4em; font-size:.95rem; }
+.cart-error{
+  margin-top:12px; color:#8c2f1b; background:#fbe9e2;
+  border:1px solid #e5b4a4; border-radius:10px; padding:10px 12px; font-size:.95rem;
+}
+.cart-after{ margin-top:14px; color:var(--muted); font-size:.9rem; }
+
+@media (max-width:480px){
+  .cartbar{ font-size:.88rem; gap:9px; padding-left:12px; padding-right:12px; }
+  .cartbar .cart-total{ display:none; }
+  .cartbar-msg{ overflow:hidden; text-overflow:ellipsis; }
+}
